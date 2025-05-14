@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { firestore as db } from "../../firebase/firebaseConfig"
 import { collection, getDocs, addDoc } from "firebase/firestore"
 import Sidebar from "../../components/Sidebar"
-import styles from "../schools/styles/AddSchool.module.css"
+import styles from "../Schools/styles/AddSchool.module.css"
 import { logActivity } from "../../utils/logActivity"
 
 const AddStudent = () => {
