@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
 import { Plus, Search, User } from "lucide-react"
 import Sidebar from "../../components/Sidebar"
-import styles from "../schools/styles/Schools.module.css"
+import styles from "../Schools/styles/Schools.module.css"
 import { useContext } from "react"
 import { AppContext } from "../../context/AppContext"
 
