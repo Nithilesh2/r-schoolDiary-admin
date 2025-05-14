@@ -13,6 +13,9 @@
   --present: #C8E6C9;
   --absent: #FFCDD2;
   --percent: #BBDEFB;
+  --border: #e5e7eb;
+  --green:  #38a169;
+  --red: #ff0000b8;
 }
 * {
   margin: 0;

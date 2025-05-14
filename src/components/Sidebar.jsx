@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react"
+import { useContext, useState } from "react"
 import { Link, useLocation } from "react-router-dom"
 import {
   LayoutDashboard,
@@ -73,7 +73,7 @@ const Sidebar = () => {
         },
       ],
     },
-    { name: "Settings", path: "/settings", icon: <Settings size={20} /> },
+    // { name: "Settings", path: "/settings", icon: <Settings size={20} /> },
   ]
 
   const toggleDropdown = (name) => {
@@ -96,19 +96,27 @@ const Sidebar = () => {
       <nav className={styles.sidebarNav}>
         {navItems.map((item) => (
           <div key={item.name}>
-            <div
-              className={`${styles.navItem} ${
-                location.pathname === item.path ? styles.active : ""
-              } ${
-                item.dropdown && openDropdown === item.name
-                  ? styles.activeParent
-                  : ""
-              }`}
-              onClick={() => item.dropdown && toggleDropdown(item.name)}
-            >
-              {item.icon}
-              {isOpen && <span>{item.name}</span>}
-            </div>
+            {item.dropdown ? (
+              <div
+                className={`${styles.navItem} ${
+                  openDropdown === item.name ? styles.activeParent : ""
+                }`}
+                onClick={() => toggleDropdown(item.name)}
+              >
+                {item.icon}
+                {isOpen && <span>{item.name}</span>}
+              </div>
+            ) : (
+              <Link
+                to={item.path}
+                className={`${styles.navItem} ${
+                  location.pathname === item.path ? styles.active : ""
+                }`}
+              >
+                {item.icon}
+                {isOpen && <span>{item.name}</span>}
+              </Link>
+            )}
 
             {item.dropdown && openDropdown === item.name && (
               <div
