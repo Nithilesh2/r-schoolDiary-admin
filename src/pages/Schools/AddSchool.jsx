@@ -1,12 +1,13 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { collection, addDoc } from "firebase/firestore"
 import { firestore } from "../../firebase/firebaseConfig"
 import Sidebar from "../../components/Sidebar"
 import styles from "./styles/AddSchool.module.css"
 import { logActivity } from "../../utils/logActivity"
-import { ClipLoader } from "react-spinners"
+import { AppContext } from "../../context/AppContext"
 
 const AddSchool = () => {
+  const { isOpen, success, failure } = useContext(AppContext)
   const [form, setForm] = useState({
     name: "",
     shortName: "",
@@ -25,9 +26,13 @@ const AddSchool = () => {
     e.preventDefault()
     try {
       setLoading(true)
-      await addDoc(collection(firestore, "schools"), form)
+      await addDoc(collection(firestore, "schools"), {
+        ...form,
+        admissions: 0,
+        createdAt: new Date()
+      })
       await logActivity(`New school '${form.name}' enrolled`, "Admin")
-      alert("School added successfully!")
+      success(`"${form.name}" added in schools list!`)
       setForm({
         name: "",
         shortName: "",
@@ -36,10 +41,9 @@ const AddSchool = () => {
         phone: "",
         address: "",
       })
-      setLoading(false)
     } catch (error) {
       console.error("Error adding school:", error)
-      alert("Failed to add school.")
+      failure("Failed to add school.")
     } finally {
       setLoading(false)
     }
@@ -59,7 +63,11 @@ const AddSchool = () => {
   return (
     <div className={styles.adminLayout}>
       <Sidebar />
-      <div className={styles.mainContent}>
+      <div
+        className={`${styles.mainContent} ${
+          isOpen ? styles.blurredContent : ""
+        }`}
+      >
         <main className={styles.content}>
           <div className={styles.pageHeader}>
             <h1>Add New School</h1>
@@ -69,7 +77,7 @@ const AddSchool = () => {
             <form onSubmit={handleSubmit}>
               <div className={styles.formGrid}>
                 <div className={styles.formGroup}>
-                  <label htmlFor="name">School Name</label>
+                  <label htmlFor="name">School Name*</label>
                   <input
                     type="text"
                     id="name"
@@ -82,20 +90,20 @@ const AddSchool = () => {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="shortName">School Short Name</label>
+                  <label htmlFor="shortName">Short Name*</label>
                   <input
                     type="text"
                     id="shortName"
                     name="shortName"
                     value={form.shortName}
                     onChange={handleChange}
-                    placeholder="Enter school short name"
+                    placeholder="Enter short name"
                     required
                   />
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="principal">Principal Name</label>
+                  <label htmlFor="principal">Principal Name*</label>
                   <input
                     type="text"
                     id="principal"
@@ -108,7 +116,7 @@ const AddSchool = () => {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="email">Principal's Email Address</label>
+                  <label htmlFor="email">Principal Email Address*</label>
                   <input
                     type="email"
                     id="email"
@@ -121,7 +129,7 @@ const AddSchool = () => {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="phone">Principal's Phone Number</label>
+                  <label htmlFor="phone">Principal Phone Number*</label>
                   <input
                     type="tel"
                     id="phone"
@@ -134,7 +142,7 @@ const AddSchool = () => {
                 </div>
 
                 <div className={`${styles.formGroup} ${styles.fullWidth}`}>
-                  <label htmlFor="address">Address</label>
+                  <label htmlFor="address">School Address*</label>
                   <textarea
                     id="address"
                     name="address"
@@ -152,11 +160,23 @@ const AddSchool = () => {
                   type="button"
                   onClick={resetClicked}
                   className={styles.cancelButton}
+                  disabled={loading}
                 >
-                  Cancel
+                  Reset
                 </button>
-                <button type="submit" className={styles.submitButton}>
-                  {loading ? "Adding School..." : "Add School"}
+                <button
+                  type="submit"
+                  className={styles.submitButton}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <span className={styles.spinner}></span>
+                      Adding School...
+                    </>
+                  ) : (
+                    "Add School"
+                  )}
                 </button>
               </div>
             </form>

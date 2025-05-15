@@ -9,8 +9,24 @@ import {
   getDocs,
 } from "firebase/firestore"
 import { firestore } from "../firebase/firebaseConfig"
+import { toast } from "react-toastify"
 
 const AppStore = ({ children }) => {
+  // Toastify
+  const options = {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: false,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+  }
+  const success = (message) => toast(message, options)
+  const failure = (message) => toast(message, options)
+
+  // Sidebar
   const [isOpen, setIsOpen] = useState(true)
 
   // All Schools
@@ -148,6 +164,11 @@ const AppStore = ({ children }) => {
   return (
     <AppContext.Provider
       value={{
+        // Toastify
+        success,
+        failure,
+
+        //Sidebar
         setIsOpen,
         isOpen,
 
@@ -168,7 +189,7 @@ const AppStore = ({ children }) => {
         filteredStudents,
         setSearchStudentTerm,
         searchStudentTerm,
-        students
+        students,
       }}
     >
       {children}

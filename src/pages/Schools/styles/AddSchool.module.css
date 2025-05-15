@@ -1,25 +1,38 @@
 .adminLayout {
   display: flex;
-  height: 100vh;
+  min-height: 100vh;
 }
 .mainContent {
   flex: 1;
   display: flex;
   flex-direction: column;
+  transition: background-color filter 0.3s linear;
 }
 .content {
-  padding: 2rem;
+  padding: 1rem;
 }
 .pageHeader {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
+.backButton {
+  color: var(--indigo);
+  text-decoration: none;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.backButton:hover {
+  text-decoration: underline;
+}
 .pageHeader h1 {
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: var(--indigo);
+  margin-top: 0.5rem;
 }
 .formCard {
   background-color: var(--white);
@@ -47,13 +60,18 @@
   color: var(--text-primary);
 }
 .formGroup input,
-.assignmentGroup input,
 .formGroup select,
-.formGroup textarea {
-  padding: 0.5rem 0.75rem;
+.formGroup textarea,
+.assignmentGroup input {
+  padding: 0.75rem;
   border: 1px solid var(--border);
   border-radius: 0.375rem;
   outline: none;
+  font-size: 1rem;
+  width: 100%;
+}
+.assignmentGroup input {
+  width: 30%;
 }
 .formGroup input:focus,
 .formGroup select:focus,
@@ -69,9 +87,10 @@
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
+  flex-wrap: wrap;
 }
 .cancelButton {
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.5rem;
   border: 1px solid var(--indigo);
   border-radius: 0.375rem;
   background: none;
@@ -83,20 +102,41 @@
 .cancelButton:hover {
   background-color: var(--border);
 }
+.cancelButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 .submitButton {
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 0.375rem;
   background-color: var(--indigo);
   color: var(--white);
   cursor: pointer;
+  font-weight: 600;
   transition: all 0.3s linear;
 }
 .submitButton:hover {
   background-color: var(--indigoHover);
 }
-
-/* add teachers */
+.submitButton:disabled {
+  background-color: var(--indigoHover);
+  opacity: 0.8;
+  cursor: wait;
+}
+.spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 .passContainer {
   display: flex;
   align-items: center;
@@ -118,22 +158,98 @@
 }
 .trashContainer,
 .AddContainer {
-  height: 30px;
-  width: 30px;
+  height: 35px;
+  width: 35px;
   background-color: var(--red);
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 20px;
 }
-.AddContainer{
+.AddContainer {
   background-color: var(--indigo);
   border-radius: 5px;
-  margin-left: 3px;
+  margin: 10px 0;
 }
-.assignmentTitle{
+.assignmentTitle {
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 5px;
   color: var(--indigo);
+}
+@media only screen and (max-width: 768px) {
+  .content {
+    padding: 1rem;
+  }
+  .formGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  .formGroup input,
+  .formGroup select,
+  .formGroup textarea {
+    padding: 0.65rem;
+  }
+  .formActions {
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .cancelButton,
+  .submitButton {
+    flex: 1;
+    text-align: center;
+    padding: 0.75rem;
+  }
+  .AddContainer {
+    margin-left: 0;
+    margin-top: 5px;
+  }
+}
+@media only screen and (max-width: 650px) {
+  .mainContent {
+    margin-left: 3rem;
+  }
+  .blurredContent {
+    filter: blur(2px);
+    pointer-events: none;
+    user-select: none;
+    background-color: rgba(0, 0, 0, 0.1);
+    z-index: -1;
+  }
+}
+@media only screen and (max-width: 480px) {
+  .pageHeader h1 {
+    font-size: 1.3rem;
+    align-self: center;
+  }
+  .formCard {
+    padding: 1rem;
+  }
+  .formActions {
+    flex-direction: column;
+  }
+  .cancelButton,
+  .submitButton {
+    width: 100%;
+  }
+  .passContainer {
+    width: 100%;
+  }
+  .trashContainer,
+  .AddContainer {
+    height: 35px;
+    width: 35px;
+  }
+  .assignmentGroup {
+    flex-direction: column;
+    align-items: stretch;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    align-items: center;
+    padding: 10px 0;
+    margin-top: 5px;
+  }
+  .assignmentGroup input {
+    width: 90%;
+  }
 }

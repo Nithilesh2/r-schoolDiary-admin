@@ -1,30 +1,18 @@
 import { useContext, useEffect, useState } from "react"
 import Sidebar from "./../components/Sidebar"
 import styles from "./Dashboard.module.css"
-import { Calendar, BookOpen, Users } from "react-feather"
 import { AppContext } from "../context/AppContext"
-import {
-  collection,
-  query,
-  orderBy,
-  limit,
-  onSnapshot,
-} from "firebase/firestore"
+import { collection, query, orderBy, onSnapshot } from "firebase/firestore"
 import { firestore as db } from "../firebase/firebaseConfig"
-import { useNavigate } from "react-router-dom";
-import { School } from "lucide-react";
+import { useNavigate } from "react-router-dom"
 
-const Dashboard = () => {
-  const { schools, teachers, students, isOpen } = useContext(AppContext)
+const ActivitiesPage = () => {
+  const { isOpen } = useContext(AppContext)
   const [activities, setActivities] = useState([])
   const navigate = useNavigate()
 
   useEffect(() => {
-    const q = query(
-      collection(db, "activities"),
-      orderBy("time", "desc"),
-      limit(5)
-    )
+    const q = query(collection(db, "activities"), orderBy("time", "desc"))
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
       setActivities(data)
@@ -42,64 +30,17 @@ const Dashboard = () => {
       >
         <main className={styles.content}>
           <div className={styles.header}>
-            <h1>Dashboard</h1>
-          </div>
-
-          <div className={styles.statsGrid}>
-            {[
-              {
-                title: "Total Schools",
-                value: schools.length,
-                color: "blue",
-                icon: <School size={20} />,
-              },
-              {
-                title: "Total Teachers",
-                value: teachers.length,
-                color: "green",
-                icon: <Users size={20} />,
-              },
-              {
-                title: "Total Students",
-                value: students.length,
-                color: "purple",
-                icon: <Users size={20} />,
-              },
-            ].map((stat, index) => (
-              <div key={index} className={styles.statCard}>
-                <div
-                  className={`${styles.statIcon} ${
-                    styles[
-                      "bg" +
-                        stat.color.charAt(0).toUpperCase() +
-                        stat.color.slice(1)
-                    ]
-                  }`}
-                >
-                  {stat.icon}
-                </div>
-                <div className={styles.statContent}>
-                  <h3>{stat.title}</h3>
-                  <p className={styles.statValue}>{stat.value}</p>
-                </div>
-              </div>
-            ))}
+            <button onClick={() => navigate("/")} className={styles.backButton}>
+              &lt; Back
+            </button>
+            <h1>All Activities</h1>
           </div>
 
           <div className={styles.dashboardGrid}>
             <div className={`${styles.card} ${styles.activityCard}`}>
-              <div className={styles.cardHeader}>
-                <h2>Recent Activity</h2>
-                <button
-                  className={styles.viewAll}
-                  onClick={() => navigate("/activities")}
-                >
-                  View All
-                </button>
-              </div>
               <div className={styles.activityList}>
                 {activities.length === 0 ? (
-                  <p>No recent activity.</p>
+                  <p>No activities found.</p>
                 ) : (
                   activities.map((item) => {
                     const timeText =
@@ -135,4 +76,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default ActivitiesPage

@@ -6,9 +6,10 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  transition: background-color filter 0.3s linear;
 }
 .content {
-  padding: 2rem;
+  padding: 2rem .7rem;
 }
 .pageHeader {
   display: flex;
@@ -81,34 +82,15 @@
   border-radius: 0.5rem;
   background: none;
   cursor: pointer;
-  transition: all .3s linear;
+  transition: all 0.3s linear;
 }
 .actionButtons button:hover {
   background-color: var(--background);
 }
 .tableContainer {
   overflow-x: auto;
-}
-table {
   width: 100%;
-  border-collapse: collapse;
-  cursor: default;
-}
-th,
-td {
-  padding: 1rem;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-}
-td{
-  font-size: 14px;
-}
-th {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  display: block;
 }
 .schoolInfo {
   display: flex;
@@ -143,4 +125,116 @@ th {
 }
 .deleteButton:hover {
   text-decoration: underline;
+}
+.tableContainer {
+  overflow-x: auto;
+}
+.desktopTable {
+  width: 100%;
+  border-collapse: collapse;
+  cursor: default;
+}
+.desktopTable th,
+.desktopTable td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.desktopTable td {
+  font-size: 14px;
+}
+.desktopTable th {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.mobileCards {
+  display: none;
+}
+.schoolCard {
+  background-color: var(--white);
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+.cardHeader {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.cardBody {
+  padding: 1rem;
+}
+.detailRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 14px;
+}
+.detailRow span:first-child,
+.principal span:first-child {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.cardActions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5rem 1rem;
+  border-top: 1px solid var(--border);
+}
+.noResults {
+  padding: 1rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+@media only screen and (max-width: 990px) {
+  .tableContainer {
+    display: none;
+  }
+  .mobileCards {
+    display: block;
+    padding: 1rem;
+  }
+  .pageHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .cardHeader {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .cardHeader h3{
+    color: var(--indigo);
+  }
+  .searchWrapper {
+    width: 100%;
+  }
+  .actionButtons {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+@media only screen and (max-width: 650px) {
+  .mainContent {
+    margin-left: 3rem;
+  }
+  .pageHeader{
+    width: 100%;
+  }
+  .pageHeader h1{
+    align-self: center;
+  }
+  .addButton{
+    align-self:flex-end;
+  }
+  .blurredContent {
+    filter: blur(2px);
+    pointer-events: none;
+    user-select: none;
+    background-color: rgba(0, 0, 0, 0.1);
+    z-index: -1;
+  }
 }
