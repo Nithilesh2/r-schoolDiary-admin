@@ -7,9 +7,12 @@ import {
   where,
   getCountFromServer,
   getDocs,
+  deleteDoc,
+  doc,
 } from "firebase/firestore"
 import { firestore } from "../firebase/firebaseConfig"
 import { toast } from "react-toastify"
+import { logActivity } from "../utils/logActivity"
 
 const AppStore = ({ children }) => {
   // Toastify
@@ -23,8 +26,8 @@ const AppStore = ({ children }) => {
     progress: undefined,
     theme: "light",
   }
-  const success = (message) => toast(message, options)
-  const failure = (message) => toast(message, options)
+  const success = (message) => toast.success(message, options)
+  const failure = (message) => toast.error(message, options)
 
   // Sidebar
   const [isOpen, setIsOpen] = useState(true)
@@ -73,34 +76,33 @@ const AppStore = ({ children }) => {
   const [teachers, setTeachers] = useState([])
   const [searchTeacherTerm, setSearchTeacherTerm] = useState("")
 
-  useEffect(() => {
-    const fetchTeachersWithSchoolNames = async () => {
-      try {
-        const schoolSnapshot = await getDocs(collection(firestore, "schools"))
-        const schoolMap = {}
-        schoolSnapshot.docs.forEach((doc) => {
-          const schoolData = doc.data()
-          schoolMap[doc.id] =
-            schoolData.name || schoolData.schoolName || "Unknown"
-        })
+  const fetchTeachersWithSchoolNames = async () => {
+    try {
+      const schoolSnapshot = await getDocs(collection(firestore, "schools"))
+      const schoolMap = {}
+      schoolSnapshot.docs.forEach((doc) => {
+        const schoolData = doc.data()
+        schoolMap[doc.id] =
+          schoolData.name || schoolData.schoolName || "Unknown"
+      })
 
-        const teacherSnapshot = await getDocs(collection(firestore, "teachers"))
-        const teachersWithSchoolName = teacherSnapshot.docs.map((doc) => {
-          const data = doc.data()
-          const schoolName = schoolMap[data.schoolId] || "Unknown School"
-          return {
-            id: doc.id,
-            ...data,
-            schoolName,
-          }
-        })
+      const teacherSnapshot = await getDocs(collection(firestore, "teachers"))
+      const teachersWithSchoolName = teacherSnapshot.docs.map((doc) => {
+        const data = doc.data()
+        const schoolName = schoolMap[data.schoolId] || "Unknown School"
+        return {
+          id: doc.id,
+          ...data,
+          schoolName,
+        }
+      })
 
-        setTeachers(teachersWithSchoolName)
-      } catch (error) {
-        console.error("Error fetching teachers or schools: ", error)
-      }
+      setTeachers(teachersWithSchoolName)
+    } catch (error) {
+      console.error("Error fetching teachers or schools: ", error)
     }
-
+  }
+  useEffect(() => {
     fetchTeachersWithSchoolNames()
   }, [])
 
@@ -119,34 +121,34 @@ const AppStore = ({ children }) => {
   const [students, setStudents] = useState([])
   const [searchStudentTerm, setSearchStudentTerm] = useState("")
 
-  useEffect(() => {
-    const fetchStudentsWithSchoolNames = async () => {
-      try {
-        const schoolSnapshot = await getDocs(collection(firestore, "schools"))
-        const schoolMap = {}
-        schoolSnapshot.docs.forEach((doc) => {
-          const schoolData = doc.data()
-          schoolMap[doc.id] =
-            schoolData.name || schoolData.schoolName || "Unknown"
-        })
+  const fetchStudentsWithSchoolNames = async () => {
+    try {
+      const schoolSnapshot = await getDocs(collection(firestore, "schools"))
+      const schoolMap = {}
+      schoolSnapshot.docs.forEach((doc) => {
+        const schoolData = doc.data()
+        schoolMap[doc.id] =
+          schoolData.name || schoolData.schoolName || "Unknown"
+      })
 
-        const studentSnapshot = await getDocs(collection(firestore, "students"))
-        const studentsWithSchoolName = studentSnapshot.docs.map((doc) => {
-          const data = doc.data()
-          const schoolName = schoolMap[data.schoolId] || "Unknown School"
-          return {
-            id: doc.id,
-            ...data,
-            schoolName,
-          }
-        })
+      const studentSnapshot = await getDocs(collection(firestore, "students"))
+      const studentsWithSchoolName = studentSnapshot.docs.map((doc) => {
+        const data = doc.data()
+        const schoolName = schoolMap[data.schoolId] || "Unknown School"
+        return {
+          id: doc.id,
+          ...data,
+          schoolName,
+        }
+      })
 
-        setStudents(studentsWithSchoolName)
-      } catch (error) {
-        console.error("Error fetching students or schools: ", error)
-      }
+      setStudents(studentsWithSchoolName)
+    } catch (error) {
+      console.error("Error fetching students or schools: ", error)
     }
+  }
 
+  useEffect(() => {
     fetchStudentsWithSchoolNames()
   }, [])
 
@@ -160,6 +162,23 @@ const AppStore = ({ children }) => {
       school.includes(searchStudentTerm)
     )
   })
+
+  // Delete Teacher
+  const handleDeleteTeacher = async (teacher) => {
+    if (!teacher?.id) return
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete ${teacher.name} `
+    )
+    if (!confirmDelete) return
+    try {
+      await deleteDoc(doc(firestore, "teachers", teacher.id))
+      setTeachers((prev) => prev.filter((t) => t.id !== teacher.id))
+      await logActivity("Successfully deleted teacher", "Admin")
+      success("Teacher deleted successfully")
+    } catch (error) {
+      failure(`error getting deleting ${error}`)
+    }
+  }
 
   return (
     <AppContext.Provider
@@ -177,6 +196,7 @@ const AppStore = ({ children }) => {
         search,
         filteredSchools,
         schools,
+        setSchools,
 
         // All Teachers
         setTeachers,
@@ -190,6 +210,11 @@ const AppStore = ({ children }) => {
         setSearchStudentTerm,
         searchStudentTerm,
         students,
+        fetchStudentsWithSchoolNames,
+
+        // Delete Teacher
+        handleDeleteTeacher,
+        fetchTeachersWithSchoolNames,
       }}
     >
       {children}

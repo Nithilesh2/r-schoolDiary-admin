@@ -1,13 +1,51 @@
 import { Link } from "react-router-dom"
-import { Plus, Search, User } from "lucide-react"
+import { Edit, Plus, Search, Trash2, User, X } from "lucide-react"
 import Sidebar from "../../components/Sidebar"
 import styles from "../Schools/styles/Schools.module.css"
-import { useContext } from "react"
+import { useContext, useEffect, useState } from "react"
 import { AppContext } from "../../context/AppContext"
+import EditTeacherModal from "../../components/EditTeacherModal"
 
 const Teachers = () => {
-  const { searchTeacherTerm, setSearchTeacherTerm, filteredTeachers, isOpen } =
-    useContext(AppContext)
+  const {
+    searchTeacherTerm,
+    setSearchTeacherTerm,
+    filteredTeachers,
+    isOpen,
+    handleDeleteTeacher,
+    fetchTeachersWithSchoolNames,
+  } = useContext(AppContext)
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [selectedTeacher, setSelectedTeacher] = useState(null)
+
+  const handleEditClick = (teacher) => {
+    setSelectedTeacher(teacher)
+    setIsEditModalOpen(true)
+  }
+
+  const handleDeleteClick = (teacher) => {
+    setSelectedTeacher(teacher)
+    setIsDeleteModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsEditModalOpen(false)
+    setIsDeleteModalOpen(false)
+    setSelectedTeacher(null)
+  }
+
+  const confirmDelete = () => {
+    if (selectedTeacher) {
+      handleDeleteTeacher(selectedTeacher)
+      handleCloseModal()
+    }
+  }
+
+  useEffect(() => {
+    fetchTeachersWithSchoolNames()
+  }, [fetchTeachersWithSchoolNames])
 
   return (
     <div className={styles.adminLayout}>
@@ -40,8 +78,8 @@ const Teachers = () => {
                 />
               </div>
               <div className={styles.actionButtons}>
-                <button>Filter</button>
-                <button>Export</button>
+                <button className={styles.filterButton}>Filter</button>
+                <button className={styles.exportButton}>Export</button>
               </div>
             </div>
 
@@ -91,10 +129,20 @@ const Teachers = () => {
                         <td>{teacher.phone || "-"}</td>
                         <td>{teacher.email || "-"}</td>
                         <td>
-                          <button className={styles.editButton}>Edit</button>
-                          <button className={styles.deleteButton}>
-                            Delete
-                          </button>
+                          <div className={styles.actionButtons}>
+                            <button
+                              className={styles.editButton}
+                              onClick={() => handleEditClick(teacher)}
+                            >
+                              <Edit size={16} />
+                            </button>
+                            <button
+                              className={styles.deleteButton}
+                              onClick={() => handleDeleteClick(teacher)}
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -157,8 +205,18 @@ const Teachers = () => {
                       </div>
                     </div>
                     <div className={styles.cardActions}>
-                      <button className={styles.editButton}>Edit</button>
-                      <button className={styles.deleteButton}>Delete</button>
+                      <button
+                        className={styles.editButton}
+                        onClick={() => handleEditClick(teacher)}
+                      >
+                        <Edit size={16} /> Edit
+                      </button>
+                      <button
+                        className={styles.deleteButton}
+                        onClick={() => handleDeleteClick(teacher)}
+                      >
+                        <Trash2 size={16} /> Delete
+                      </button>
                     </div>
                   </div>
                 ))
@@ -167,6 +225,52 @@ const Teachers = () => {
           </div>
         </main>
       </div>
+
+      {isEditModalOpen && (
+        <EditTeacherModal
+          teacher={selectedTeacher}
+          onClose={handleCloseModal}
+        />
+      )}
+
+      {isDeleteModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.deleteModalContent}>
+            <div className={styles.deleteModalHeader}>
+              <Trash2 size={24} className={styles.deleteIcon} />
+              <h2>Delete Teacher</h2>
+            </div>
+
+            <div className={styles.deleteModalBody}>
+              <p>
+                Are you sure you want to delete{" "}
+                <strong>{selectedTeacher?.name}</strong>? This action cannot be
+                undone.
+              </p>
+              {selectedTeacher?.assignments?.length > 0 && (
+                <div className={styles.warningNote}>
+                  <p>This will also remove all their class assignments.</p>
+                </div>
+              )}
+            </div>
+
+            <div className={styles.deleteModalFooter}>
+              <button
+                onClick={handleCloseModal}
+                className={styles.cancelDeleteButton}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className={styles.confirmDeleteButton}
+              >
+                <Trash2 size={16} /> Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

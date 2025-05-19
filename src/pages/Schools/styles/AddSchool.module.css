@@ -132,6 +132,44 @@
   border-top-color: white;
   animation: spin 1s ease-in-out infinite;
 }
+.sectionDivider {
+  position: relative;
+  margin: 1.5rem 0 1rem;
+  text-align: left;
+  grid-column: 1 / -1;
+}
+.sectionDivider span {
+  display: inline-block;
+  padding: 0 0.5rem 0 0;
+  background-color: white;
+  position: relative;
+  z-index: 1;
+  color: #444;
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
+.sectionDivider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #eee;
+  z-index: 0;
+}
+input[type="date"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+}
+input[type="date"]:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
 @keyframes spin {
   to {
     transform: rotate(360deg);

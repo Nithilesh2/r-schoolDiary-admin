@@ -20,8 +20,6 @@ const AddStudent = () => {
   const { isOpen, success, failure } = useContext(AppContext)
   const [name, setName] = useState("")
   const [studentClass, setStudentClass] = useState("")
-  const [parentEmail, setParentEmail] = useState("")
-  const [phone, setPhone] = useState("")
   const [address, setAddress] = useState("")
   const [schoolId, setSchoolId] = useState("")
   const [schools, setSchools] = useState([])
@@ -30,6 +28,21 @@ const AddStudent = () => {
   const [admissionNumber, setAdmissionNumber] = useState("")
   const [tempPassword, setTempPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+
+  const [dob, setDob] = useState("")
+  const [bloodGroup, setBloodGroup] = useState("")
+  const [father, setFather] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    occupation: "",
+  })
+  const [mother, setMother] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    occupation: "",
+  })
 
   useEffect(() => {
     const fetchSchools = async () => {
@@ -65,16 +78,32 @@ const AddStudent = () => {
     }
   }, [schoolId, schools])
 
+  const handleFatherChange = (e) => {
+    const { name, value } = e.target
+    setFather((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleMotherChange = (e) => {
+    const { name, value } = e.target
+    setMother((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
     if (
       !name ||
       !studentClass ||
-      !parentEmail ||
-      !phone ||
       !address ||
-      !schoolId
+      !schoolId ||
+      !father.name ||
+      !father.phone
     ) {
       alert("Please fill all required fields")
       return
@@ -110,8 +139,6 @@ const AddStudent = () => {
         classId: studentClass,
         studentName: name,
         studentEmail,
-        parentEmail,
-        phone,
         address,
         schoolId,
         schoolName: schoolData.name,
@@ -119,6 +146,12 @@ const AddStudent = () => {
         role: "student",
         tempPassword,
         createdAt: new Date(),
+        dob,
+        bloodGroup,
+        parents: {
+          father,
+          mother,
+        },
       })
 
       await updateDoc(schoolRef, {
@@ -147,13 +180,25 @@ const AddStudent = () => {
 
       setName("")
       setStudentClass("")
-      setParentEmail("")
-      setPhone("")
       setAddress("")
       setSchoolId("")
       setSectionId("")
       setTempPassword("")
       setAdmissionNumber("")
+      setDob("")
+      setBloodGroup("")
+      setFather({
+        name: "",
+        phone: "",
+        email: "",
+        occupation: "",
+      })
+      setMother({
+        name: "",
+        phone: "",
+        email: "",
+        occupation: "",
+      })
     } catch (error) {
       console.error("Error adding student: ", error)
       let errorMessage = "Error adding student"
@@ -173,11 +218,23 @@ const AddStudent = () => {
   const resetClicked = () => {
     setName("")
     setStudentClass("")
-    setParentEmail("")
-    setPhone("")
     setAddress("")
     setSchoolId("")
     setSectionId("")
+    setDob("")
+    setBloodGroup("")
+    setFather({
+      name: "",
+      phone: "",
+      email: "",
+      occupation: "",
+    })
+    setMother({
+      name: "",
+      phone: "",
+      email: "",
+      occupation: "",
+    })
   }
 
   return (
@@ -196,6 +253,7 @@ const AddStudent = () => {
           <div className={styles.formCard}>
             <form onSubmit={handleSubmit}>
               <div className={styles.formGrid}>
+                {/* Student Basic Information */}
                 <div className={styles.formGroup}>
                   <label htmlFor="name">Full Name*</label>
                   <input
@@ -210,29 +268,34 @@ const AddStudent = () => {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="parentEmail">Parent's Email Address*</label>
+                  <label htmlFor="dob">Date of Birth</label>
                   <input
-                    type="email"
-                    id="parentEmail"
-                    name="parentEmail"
-                    placeholder="Enter parent's email address"
-                    value={parentEmail}
-                    onChange={(e) => setParentEmail(e.target.value)}
-                    required
+                    type="date"
+                    id="dob"
+                    name="dob"
+                    value={dob}
+                    onChange={(e) => setDob(e.target.value)}
                   />
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="phone">Parent's Phone Number*</label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    placeholder="Enter parent's phone number"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
-                  />
+                  <label htmlFor="bloodGroup">Blood Group</label>
+                  <select
+                    id="bloodGroup"
+                    name="bloodGroup"
+                    value={bloodGroup}
+                    onChange={(e) => setBloodGroup(e.target.value)}
+                  >
+                    <option value="">Select Blood Group</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                  </select>
                 </div>
 
                 <div className={styles.formGroup}>
@@ -274,11 +337,12 @@ const AddStudent = () => {
                     name="section"
                     placeholder="Enter section ID"
                     value={sectionId}
-                    onChange={(e) => setSectionId(e.target.value)}
+                    onChange={(e) => setSectionId(e.target.value.toUpperCase())}
                     required
                   />
                 </div>
 
+                {/* Auto-generated fields */}
                 <div className={styles.formGroup}>
                   <label htmlFor="admission">Admission Number</label>
                   <input
@@ -333,6 +397,114 @@ const AddStudent = () => {
                       />
                     )}
                   </div>
+                </div>
+
+                <div className={styles.sectionDivider}>
+                  <span>Father's Information</span>
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="fatherName">Father's Name*</label>
+                  <input
+                    type="text"
+                    id="fatherName"
+                    name="name"
+                    placeholder="Enter father's name"
+                    value={father.name}
+                    onChange={handleFatherChange}
+                    required
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="fatherPhone">Father's Phone*</label>
+                  <input
+                    type="tel"
+                    id="fatherPhone"
+                    name="phone"
+                    placeholder="Enter father's phone number"
+                    value={father.phone}
+                    onChange={handleFatherChange}
+                    maxLength={10}
+                    required
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="fatherEmail">Father's Email</label>
+                  <input
+                    type="email"
+                    id="fatherEmail"
+                    name="email"
+                    placeholder="Enter father's email"
+                    value={father.email}
+                    onChange={handleFatherChange}
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="fatherOccupation">Father's Occupation</label>
+                  <input
+                    type="text"
+                    id="fatherOccupation"
+                    name="occupation"
+                    placeholder="Enter father's occupation"
+                    value={father.occupation}
+                    onChange={handleFatherChange}
+                  />
+                </div>
+
+                <div className={styles.sectionDivider}>
+                  <span>Mother's Information</span>
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="motherName">Mother's Name</label>
+                  <input
+                    type="text"
+                    id="motherName"
+                    name="name"
+                    placeholder="Enter mother's name"
+                    value={mother.name}
+                    onChange={handleMotherChange}
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="motherPhone">Mother's Phone</label>
+                  <input
+                    type="tel"
+                    id="motherPhone"
+                    name="phone"
+                    placeholder="Enter mother's phone number"
+                    value={mother.phone}
+                    onChange={handleMotherChange}
+                    maxLength={10}
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="motherEmail">Mother's Email</label>
+                  <input
+                    type="email"
+                    id="motherEmail"
+                    name="email"
+                    placeholder="Enter mother's email"
+                    value={mother.email}
+                    onChange={handleMotherChange}
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="motherOccupation">Mother's Occupation</label>
+                  <input
+                    type="text"
+                    id="motherOccupation"
+                    name="occupation"
+                    placeholder="Enter mother's occupation"
+                    value={mother.occupation}
+                    onChange={handleMotherChange}
+                  />
                 </div>
 
                 <div className={`${styles.formGroup} ${styles.fullWidth}`}>
