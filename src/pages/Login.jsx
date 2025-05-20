@@ -106,20 +106,6 @@ const Login = () => {
             </div>
           </div>
 
-          <div className={styles.optionsContainer}>
-            <div className={styles.rememberMe}>
-              <input
-                type="checkbox"
-                id="remember"
-                className={styles.checkbox}
-              />
-              <label htmlFor="remember">Remember me</label>
-            </div>
-            <a href="/forgot-password" className={styles.forgotPassword}>
-              Forgot password?
-            </a>
-          </div>
-
           <button
             type="submit"
             className={styles.loginButton}
