@@ -1,11 +1,11 @@
 import { useContext, useState } from "react"
-import { Link, useLocation } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import {
   LayoutDashboard,
   School,
   Users,
   BookUser,
-  Settings,
+  LogOut,
   Building2,
   CirclePlus,
   UserRound,
@@ -13,12 +13,26 @@ import {
 } from "lucide-react"
 import styles from "./styles/Sidebar.module.css"
 import { AppContext } from "../context/AppContext"
+import { useCookies } from "react-cookie"
+import { signOut } from "firebase/auth"
+import { auth } from "../firebase/firebaseConfig"
 
 const Sidebar = () => {
   const location = useLocation()
+  const navigate = useNavigate()
   const { setIsOpen, isOpen } = useContext(AppContext)
-
+  const [, , removeCookie] = useCookies(["userAuthenticated"])
   const [openDropdown, setOpenDropdown] = useState(null)
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth)
+      removeCookie("userAuthenticated", { path: "/" })
+      navigate("/login", { replace: true })
+    } catch (err) {
+      console.error("Logout error:", err)
+    }
+  }
 
   const navItems = [
     { name: "Dashboard", path: "/", icon: <LayoutDashboard size={20} /> },
@@ -27,16 +41,8 @@ const Sidebar = () => {
       path: "/schools",
       icon: <School size={20} />,
       dropdown: [
-        {
-          name: "All Schools",
-          path: "/schools",
-          icon: <Building2 size={18} />,
-        },
-        {
-          name: "Add School",
-          path: "/schools/add",
-          icon: <CirclePlus size={18} />,
-        },
+        { name: "All Schools", path: "/schools", icon: <Building2 size={18} /> },
+        { name: "Add School", path: "/schools/add", icon: <CirclePlus size={18} /> },
       ],
     },
     {
@@ -44,16 +50,8 @@ const Sidebar = () => {
       path: "/teachers",
       icon: <Users size={20} />,
       dropdown: [
-        {
-          name: "All Teachers",
-          path: "/teachers",
-          icon: <UserRound size={18} />,
-        },
-        {
-          name: "Add Teacher",
-          path: "/teachers/add",
-          icon: <CirclePlus size={18} />,
-        },
+        { name: "All Teachers", path: "/teachers", icon: <UserRound size={18} /> },
+        { name: "Add Teacher", path: "/teachers/add", icon: <CirclePlus size={18} /> },
       ],
     },
     {
@@ -61,19 +59,15 @@ const Sidebar = () => {
       path: "/students",
       icon: <BookUser size={20} />,
       dropdown: [
-        {
-          name: "All Students",
-          path: "/students",
-          icon: <GraduationCap size={18} />,
-        },
-        {
-          name: "Add Student",
-          path: "/students/add",
-          icon: <CirclePlus size={18} />,
-        },
+        { name: "All Students", path: "/students", icon: <GraduationCap size={18} /> },
+        { name: "Add Student", path: "/students/add", icon: <CirclePlus size={18} /> },
       ],
     },
-    // { name: "Settings", path: "/settings", icon: <Settings size={20} /> },
+    {
+      name: "Logout",
+      action: "logout",
+      icon: <LogOut size={20} />,
+    },
   ]
 
   const toggleDropdown = (name) => {
@@ -81,9 +75,7 @@ const Sidebar = () => {
   }
 
   return (
-    <div
-      className={`${styles.sidebar} ${isOpen ? styles.open : styles.closed}`}
-    >
+    <div className={`${styles.sidebar} ${isOpen ? styles.open : styles.closed}`}>
       <button className={styles.toggleBtn} onClick={() => setIsOpen(!isOpen)}>
         {isOpen ? "<" : ">"}
       </button>
@@ -102,6 +94,15 @@ const Sidebar = () => {
                   openDropdown === item.name ? styles.activeParent : ""
                 }`}
                 onClick={() => toggleDropdown(item.name)}
+              >
+                {item.icon}
+                {isOpen && <span>{item.name}</span>}
+              </div>
+            ) : item.action === "logout" ? (
+              <div
+                onClick={handleLogout}
+                className={styles.navItem}
+                style={{ cursor: "pointer" }}
               >
                 {item.icon}
                 {isOpen && <span>{item.name}</span>}

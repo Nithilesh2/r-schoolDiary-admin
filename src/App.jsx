@@ -7,21 +7,81 @@ import AddStudents from "./pages/Students/AddStudents"
 import Teacher from "./pages/Teachers/Teacher"
 import AddTeacher from "./pages/Teachers/AddTeacher"
 import "./App.css"
-import { ToastContainer } from "react-toastify";
-import ActivitiesPage from "./pages/ActivitiesPage";
+import { ToastContainer } from "react-toastify"
+import ActivitiesPage from "./pages/ActivitiesPage"
+import Login from "./pages/Login"
+import ProtectedRoute from "./pages/ProtectedRoute";
 
 function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/activities" element={<ActivitiesPage />} />
-        <Route path="/schools" element={<Schools />} />
-        <Route path="/schools/add" element={<AddSchool />} />
-        <Route path="/students" element={<Students />} />
-        <Route path="/students/add" element={<AddStudents />} />
-        <Route path="/teachers" element={<Teacher />} />
-        <Route path="/teachers/add" element={<AddTeacher />} />
+        <Route path="/login" element={<Login />} />
+
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/activities"
+          element={
+            <ProtectedRoute>
+              <ActivitiesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/schools"
+          element={
+            <ProtectedRoute>
+              <Schools />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/schools/add"
+          element={
+            <ProtectedRoute>
+              <AddSchool />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/students"
+          element={
+            <ProtectedRoute>
+              <Students />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/students/add"
+          element={
+            <ProtectedRoute>
+              <AddStudents />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teachers"
+          element={
+            <ProtectedRoute>
+              <Teacher />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teachers/add"
+          element={
+            <ProtectedRoute>
+              <AddTeacher />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
       <ToastContainer />
     </>
