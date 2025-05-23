@@ -137,6 +137,7 @@ const AddSchool = () => {
                     value={form.phone}
                     onChange={handleChange}
                     placeholder="Enter phone number"
+                    maxLength={10}
                     required
                   />
                 </div>

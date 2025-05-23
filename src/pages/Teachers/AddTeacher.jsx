@@ -188,6 +188,7 @@ const AddTeacher = () => {
                       placeholder="Enter phone number"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
+                      maxLength={10}
                       required
                     />
                   </div>

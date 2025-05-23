@@ -28,8 +28,13 @@ const Login = () => {
     try {
       setLoading(true)
       const user = await signInWithEmailAndPassword(auth, email, password)
-      setCookies("userAuthenticated", user.user.uid, { path: "/" });
-      navigate("/", {replace: true})
+      setCookies("userAuthenticated", user.user.uid, {
+        path: "/",
+        expires: new Date(new Date().getTime() + 15 * 60 * 1000),
+        secure: true,
+        sameSite: "strict",
+      })
+      navigate("/", { replace: true })
     } catch (err) {
       console.error("Login error:", err)
       switch (err.code) {

@@ -77,10 +77,10 @@ const Teachers = () => {
                   }
                 />
               </div>
-              <div className={styles.actionButtons}>
+              {/* <div className={styles.actionButtons}>
                 <button className={styles.filterButton}>Filter</button>
                 <button className={styles.exportButton}>Export</button>
-              </div>
+              </div> */}
             </div>
 
             <div className={styles.tableContainer}>

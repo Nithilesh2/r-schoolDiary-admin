@@ -112,7 +112,7 @@ const Students = () => {
         studentName: formData.studentName,
         admissionNumber: formData.admissionNumber,
         classId: formData.classId,
-        sectionId: formData.sectionId,
+        sectionId: (formData.sectionId).toUpperCase(),
         studentEmail: formData.email,
         address: formData.address,
         dob: formData.dob,
@@ -185,10 +185,10 @@ const Students = () => {
                   onChange={(e) => setSearchStudentTerm(e.target.value)}
                 />
               </div>
-              <div className={styles.actionButtons}>
+              {/* <div className={styles.actionButtons}>
                 <button className={styles.filterButton}>Filter</button>
                 <button className={styles.exportButton}>Export</button>
-              </div>
+              </div> */}
             </div>
 
             <div className={styles.tableContainer}>
@@ -197,7 +197,7 @@ const Students = () => {
                   <tr>
                     <th>Name</th>
                     <th>School</th>
-                    <th>Roll Number</th>
+                    <th>Admission Number</th>
                     <th>Class</th>
                     <th>Section</th>
                     <th>Father's Name</th>
@@ -369,8 +369,7 @@ const Students = () => {
                     type="text"
                     name="sectionId"
                     value={formData.sectionId}
-                    // onChange={handleChange}
-                    style={{cursor: 'not-allowed'}}
+                    onChange={handleChange}
                   />
                 </div>
 
