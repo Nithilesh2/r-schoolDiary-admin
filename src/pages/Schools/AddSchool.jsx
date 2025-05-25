@@ -1,10 +1,11 @@
 import { useContext, useState } from "react"
 import { collection, addDoc } from "firebase/firestore"
-import { firestore } from "../../firebase/firebaseConfig"
+import { auth, firestore } from "../../firebase/firebaseConfig"
 import Sidebar from "../../components/Sidebar"
 import styles from "./styles/AddSchool.module.css"
 import { logActivity } from "../../utils/logActivity"
 import { AppContext } from "../../context/AppContext"
+import { createUserWithEmailAndPassword } from "firebase/auth"
 
 const AddSchool = () => {
   const { isOpen, success, failure } = useContext(AppContext)
@@ -15,24 +16,58 @@ const AddSchool = () => {
     email: "",
     phone: "",
     address: "",
+    adminEmail: "",
+    adminPassword: "",
   })
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    setForm((prev) => {
+      if (name === "shortName") {
+        const formattedName = value.toLowerCase().replace(/\s+/g, "-")
+        return {
+          ...prev,
+          [name]: value,
+          adminEmail: value ? `${formattedName}-admin@schooldiary.com` : "",
+        }
+      }
+      return { ...prev, [name]: value }
+    })
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
       setLoading(true)
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        form.adminEmail,
+        form.adminPassword
+      )
+
       await addDoc(collection(firestore, "schools"), {
-        ...form,
+        name: form.name,
+        shortName: form.shortName,
+        principal: form.principal,
+        email: form.email,
+        phone: form.phone,
+        address: form.address,
+        adminEmail: form.adminEmail,
+        adminUid: userCredential.user.uid,
         admissions: 0,
-        createdAt: new Date()
+        type: 'school-admin',
+        createdAt: new Date(),
       })
-      await logActivity(`New school '${form.name}' enrolled`, "Admin")
-      success(`"${form.name}" added in schools list!`)
+
+      await logActivity(
+        `New school '${form.name}' enrolled with admin ${form.adminEmail}`,
+        "Admin"
+      )
+
+      success(`"${form.name}" added successfully with admin credentials!`)
+
       setForm({
         name: "",
         shortName: "",
@@ -40,10 +75,26 @@ const AddSchool = () => {
         email: "",
         phone: "",
         address: "",
+        adminEmail: "",
+        adminPassword: "",
       })
     } catch (error) {
       console.error("Error adding school:", error)
-      failure("Failed to add school.")
+
+      let errorMessage = "Failed to add school."
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          errorMessage = "Admin email already in use."
+          break
+        case "auth/invalid-email":
+          errorMessage = "Invalid admin email address."
+          break
+        case "auth/weak-password":
+          errorMessage = "Admin password is too weak."
+          break
+      }
+
+      failure(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -57,6 +108,8 @@ const AddSchool = () => {
       email: "",
       phone: "",
       address: "",
+      adminEmail: "",
+      adminPassword: "",
     })
   }
 
@@ -154,6 +207,53 @@ const AddSchool = () => {
                     required
                   ></textarea>
                 </div>
+              </div>
+
+              <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                <h3 className={styles.sectionHeader}>
+                  School Admin Credentials
+                </h3>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="adminEmail">Admin Email*</label>
+                <input
+                  type="email"
+                  id="adminEmail"
+                  name="adminEmail"
+                  value={form.adminEmail}
+                  onChange={handleChange}
+                  placeholder="schoolname-admin@schooldiary.com"
+                  required
+                  readOnly={!!form.name}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="adminPassword">Admin Password*</label>
+                <div className={styles.passwordInputContainer}>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="adminPassword"
+                    name="adminPassword"
+                    value={form.adminPassword}
+                    onChange={handleChange}
+                    placeholder="Enter password for admin"
+                    required
+                    minLength={8}
+                  />
+                  <button
+                    type="button"
+                    className={styles.passwordToggle}
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
+                <p className={styles.passwordHint}>
+                  Minimum 8 characters with at least one number and one special
+                  character
+                </p>
               </div>
 
               <div className={styles.formActions}>

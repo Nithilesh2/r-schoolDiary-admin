@@ -7,7 +7,6 @@
   padding: 1rem;
   background-image: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
-
 .loginCard {
   background-color: white;
   border-radius: 12px;
@@ -17,33 +16,27 @@
   padding: 2.5rem;
   text-align: center;
 }
-
 .logoContainer {
   margin-bottom: 2rem;
 }
-
 .logo {
   height: 60px;
   margin-bottom: 1rem;
 }
-
 .title {
   font-size: 1.5rem;
   font-weight: 600;
   color: #1e293b;
   margin-bottom: 0.5rem;
 }
-
 .subtitle {
   color: #64748b;
   font-size: 0.9375rem;
   margin-bottom: 0;
 }
-
 .loginForm {
   margin-top: 2rem;
 }
-
 .errorMessage {
   background-color: #fee2e2;
   color: #b91c1c;
@@ -52,12 +45,10 @@
   margin-bottom: 1.5rem;
   font-size: 0.875rem;
 }
-
 .inputGroup {
   margin-bottom: 1.25rem;
   text-align: left;
 }
-
 .inputLabel {
   display: block;
   margin-bottom: 0.5rem;
@@ -65,11 +56,9 @@
   font-weight: 500;
   color: #334155;
 }
-
 .inputContainer {
   position: relative;
 }
-
 .inputIcon {
   position: absolute;
   left: 12px;
@@ -77,7 +66,6 @@
   transform: translateY(-50%);
   color: #94a3b8;
 }
-
 .inputField {
   width: 100%;
   padding: 0.75rem 1rem 0.75rem 40px;
@@ -86,13 +74,11 @@
   font-size: 0.9375rem;
   transition: all 0.2s;
 }
-
 .inputField:focus {
   outline: none;
   border-color: var(--indigoHover);
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
-
 .passwordToggle {
   position: absolute;
   right: 12px;
@@ -104,11 +90,9 @@
   cursor: pointer;
   padding: 4px;
 }
-
 .passwordToggle:hover {
   color: #64748b;
 }
-
 .optionsContainer {
   display: flex;
   justify-content: space-between;
@@ -116,30 +100,25 @@
   margin: 1.5rem 0;
   font-size: 0.875rem;
 }
-
 .rememberMe {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   color: #64748b;
 }
-
 .checkbox {
   width: 16px;
   height: 16px;
   accent-color: var(--indigo);
 }
-
 .forgotPassword {
   color: var(--indigo);
   text-decoration: none;
   font-weight: 500;
 }
-
 .forgotPassword:hover {
   text-decoration: underline;
 }
-
 .loginButton {
   width: 100%;
   padding: 0.875rem;
@@ -152,16 +131,13 @@
   cursor: pointer;
   transition: background-color 0.2s;
 }
-
 .loginButton:hover {
   background-color: var(--indigoHover);
 }
-
 .loginButton:disabled {
   background-color: #a5b4fc;
   cursor: not-allowed;
 }
-
 .footer {
   margin-top: 0.5rem;
   font-size: 0.75rem;
@@ -170,13 +146,34 @@
   padding-top: 0.5rem;
   border-top: 1px solid #f1f5f9;
 }
-
 .footerLink {
   color: var(--indigo);
   font-weight: 500;
   text-decoration: none;
 }
-
 .footerLink:hover {
   text-decoration: underline;
+}
+.toggleLoginButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  margin-top: 16px;
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.toggleLoginButton:hover {
+  background-color: #e0e0e0;
+}
+.buttonIcon {
+  margin-right: 8px;
 }

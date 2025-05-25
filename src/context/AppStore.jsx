@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react"
 import { AppContext } from "./AppContext"
 import {
@@ -28,6 +29,23 @@ const AppStore = ({ children }) => {
   }
   const success = (message) => toast.success(message, options)
   const failure = (message) => toast.error(message, options)
+  const [adminDetails, setAdminDetails] = useState({
+    uid: "",
+    adminType: "",
+    schoolId: "",
+  })
+
+  useEffect(() => {
+    const uid = localStorage.getItem("uid")
+    const adminType = localStorage.getItem("userType")
+    const schoolId = localStorage.getItem("schoolId")
+
+    setAdminDetails({
+      uid: uid || "",
+      adminType: adminType || "",
+      schoolId: schoolId || "",
+    })
+  }, [])
 
   // Sidebar
   const [isOpen, setIsOpen] = useState(true)
@@ -86,7 +104,15 @@ const AppStore = ({ children }) => {
           schoolData.name || schoolData.schoolName || "Unknown"
       })
 
-      const teacherSnapshot = await getDocs(collection(firestore, "teachers"))
+      const teacherQuery =
+        adminDetails.adminType !== "school-admin"
+          ? collection(firestore, "teachers")
+          : query(
+              collection(firestore, "teachers"),
+              where("schoolId", "==", adminDetails.schoolId)
+            )
+
+      const teacherSnapshot = await getDocs(teacherQuery)
       const teachersWithSchoolName = teacherSnapshot.docs.map((doc) => {
         const data = doc.data()
         const schoolName = schoolMap[data.schoolId] || "Unknown School"
@@ -102,6 +128,7 @@ const AppStore = ({ children }) => {
       console.error("Error fetching teachers or schools: ", error)
     }
   }
+
   useEffect(() => {
     fetchTeachersWithSchoolNames()
   }, [])
@@ -131,7 +158,15 @@ const AppStore = ({ children }) => {
           schoolData.name || schoolData.schoolName || "Unknown"
       })
 
-      const studentSnapshot = await getDocs(collection(firestore, "students"))
+      const studentQuery =
+        adminDetails.adminType !== "school-admin"
+          ? collection(firestore, "students")
+          : query(
+              collection(firestore, "students"),
+              where("schoolId", "==", adminDetails.schoolId)
+            )
+
+      const studentSnapshot = await getDocs(studentQuery)
       const studentsWithSchoolName = studentSnapshot.docs.map((doc) => {
         const data = doc.data()
         const schoolName = schoolMap[data.schoolId] || "Unknown School"
@@ -183,6 +218,8 @@ const AppStore = ({ children }) => {
   return (
     <AppContext.Provider
       value={{
+        adminDetails,
+
         // Toastify
         success,
         failure,

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useContext } from "react"
 import { firestore as db, auth } from "../../firebase/firebaseConfig"
 import {
@@ -17,7 +18,7 @@ import { AppContext } from "../../context/AppContext"
 import { Eye, EyeOff } from "lucide-react"
 
 const AddStudent = () => {
-  const { isOpen, success, failure } = useContext(AppContext)
+  const { isOpen, success, failure, adminDetails } = useContext(AppContext)
   const [name, setName] = useState("")
   const [studentClass, setStudentClass] = useState("")
   const [address, setAddress] = useState("")
@@ -46,14 +47,38 @@ const AddStudent = () => {
 
   useEffect(() => {
     const fetchSchools = async () => {
-      const querySnapshot = await getDocs(collection(db, "schools"))
-      const schoolList = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        name: doc.data().name,
-        shortName: doc.data().shortName || generateShortName(doc.data().name),
-        admissions: doc.data().admissions || 0,
-      }))
-      setSchools(schoolList)
+      try {
+        if (adminDetails.adminType !== "school-admin") {
+          const querySnapshot = await getDocs(collection(db, "schools"))
+          const schoolList = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            name: doc.data().name,
+            shortName:
+              doc.data().shortName || generateShortName(doc.data().name),
+            admissions: doc.data().admissions || 0,
+          }))
+          setSchools(schoolList)
+        } else {
+          const schoolRef = doc(db, "schools", adminDetails.schoolId)
+          const schoolSnap = await getDoc(schoolRef)
+
+          if (schoolSnap.exists()) {
+            const data = schoolSnap.data()
+            const school = {
+              id: schoolSnap.id,
+              name: data.name,
+              shortName: data.shortName || generateShortName(data.name),
+              admissions: data.admissions || 0,
+            }
+            setSchools([school])
+            setSchoolId(school.id)
+          } else {
+            failure("School not found for the current admin")
+          }
+        }
+      } catch (error) {
+        console.log(error)
+      }
     }
 
     fetchSchools()

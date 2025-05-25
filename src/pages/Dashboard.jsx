@@ -11,11 +11,12 @@ import {
   onSnapshot,
 } from "firebase/firestore"
 import { firestore as db } from "../firebase/firebaseConfig"
-import { useNavigate } from "react-router-dom";
-import { School } from "lucide-react";
+import { useNavigate } from "react-router-dom"
+import { School } from "lucide-react"
 
 const Dashboard = () => {
-  const { schools, teachers, students, isOpen } = useContext(AppContext)
+  const { schools, teachers, students, isOpen, adminDetails } =
+    useContext(AppContext)
   const [activities, setActivities] = useState([])
   const navigate = useNavigate()
 
@@ -47,12 +48,16 @@ const Dashboard = () => {
 
           <div className={styles.statsGrid}>
             {[
-              {
-                title: "Total Schools",
-                value: schools.length,
-                color: "blue",
-                icon: <School size={20} />,
-              },
+              ...(adminDetails.adminType !== "school-admin"
+                ? [
+                    {
+                      title: "Total Schools",
+                      value: schools.length,
+                      color: "blue",
+                      icon: <School size={20} />,
+                    },
+                  ]
+                : []),
               {
                 title: "Total Teachers",
                 value: teachers.length,

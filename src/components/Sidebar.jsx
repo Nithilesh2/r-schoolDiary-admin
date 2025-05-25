@@ -20,7 +20,7 @@ import { auth } from "../firebase/firebaseConfig"
 const Sidebar = () => {
   const location = useLocation()
   const navigate = useNavigate()
-  const { setIsOpen, isOpen } = useContext(AppContext)
+  const { setIsOpen, isOpen, adminDetails } = useContext(AppContext)
   const [, , removeCookie] = useCookies(["userAuthenticated"])
   const [openDropdown, setOpenDropdown] = useState(null)
 
@@ -28,6 +28,7 @@ const Sidebar = () => {
     try {
       await signOut(auth)
       removeCookie("userAuthenticated", { path: "/" })
+      localStorage.clear()
       navigate("/login", { replace: true })
     } catch (err) {
       console.error("Logout error:", err)
@@ -36,22 +37,42 @@ const Sidebar = () => {
 
   const navItems = [
     { name: "Dashboard", path: "/", icon: <LayoutDashboard size={20} /> },
-    {
-      name: "Schools",
-      path: "/schools",
-      icon: <School size={20} />,
-      dropdown: [
-        { name: "All Schools", path: "/schools", icon: <Building2 size={18} /> },
-        { name: "Add School", path: "/schools/add", icon: <CirclePlus size={18} /> },
-      ],
-    },
+    ...(adminDetails.adminType !== "school-admin"
+      ? [
+          {
+            name: "Schools",
+            path: "/schools",
+            icon: <School size={20} />,
+            dropdown: [
+              {
+                name: "All Schools",
+                path: "/schools",
+                icon: <Building2 size={18} />,
+              },
+              {
+                name: "Add School",
+                path: "/schools/add",
+                icon: <CirclePlus size={18} />,
+              },
+            ],
+          },
+        ]
+      : []),
     {
       name: "Teachers",
       path: "/teachers",
       icon: <Users size={20} />,
       dropdown: [
-        { name: "All Teachers", path: "/teachers", icon: <UserRound size={18} /> },
-        { name: "Add Teacher", path: "/teachers/add", icon: <CirclePlus size={18} /> },
+        {
+          name: "All Teachers",
+          path: "/teachers",
+          icon: <UserRound size={18} />,
+        },
+        {
+          name: "Add Teacher",
+          path: "/teachers/add",
+          icon: <CirclePlus size={18} />,
+        },
       ],
     },
     {
@@ -59,8 +80,16 @@ const Sidebar = () => {
       path: "/students",
       icon: <BookUser size={20} />,
       dropdown: [
-        { name: "All Students", path: "/students", icon: <GraduationCap size={18} /> },
-        { name: "Add Student", path: "/students/add", icon: <CirclePlus size={18} /> },
+        {
+          name: "All Students",
+          path: "/students",
+          icon: <GraduationCap size={18} />,
+        },
+        {
+          name: "Add Student",
+          path: "/students/add",
+          icon: <CirclePlus size={18} />,
+        },
       ],
     },
     {
@@ -75,7 +104,9 @@ const Sidebar = () => {
   }
 
   return (
-    <div className={`${styles.sidebar} ${isOpen ? styles.open : styles.closed}`}>
+    <div
+      className={`${styles.sidebar} ${isOpen ? styles.open : styles.closed}`}
+    >
       <button className={styles.toggleBtn} onClick={() => setIsOpen(!isOpen)}>
         {isOpen ? "<" : ">"}
       </button>

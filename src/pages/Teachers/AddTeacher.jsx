@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useContext } from "react"
 import { firestore as db, auth } from "../../firebase/firebaseConfig"
-import { collection, getDocs, addDoc } from "firebase/firestore"
+import { collection, getDocs, addDoc, doc, getDoc } from "firebase/firestore"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import Sidebar from "../../components/Sidebar"
 import styles from "../Schools/styles/AddSchool.module.css"
@@ -9,7 +10,7 @@ import { logActivity } from "../../utils/logActivity"
 import { AppContext } from "../../context/AppContext"
 
 const AddTeacher = () => {
-  const { isOpen, success, failure } = useContext(AppContext)
+  const { isOpen, success, failure, adminDetails } = useContext(AppContext)
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
@@ -26,12 +27,37 @@ const AddTeacher = () => {
 
   useEffect(() => {
     const fetchSchools = async () => {
-      const querySnapshot = await getDocs(collection(db, "schools"))
-      const schoolList = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        name: doc.data().name,
-      }))
-      setSchools(schoolList)
+      try {
+        if (adminDetails.adminType !== "school-admin") {
+          const querySnapshot = await getDocs(collection(db, "schools"))
+          const schoolList = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            name: doc.data().name,
+            shortName: doc.data().shortName,
+            admissions: doc.data().admissions || 0,
+          }))
+          setSchools(schoolList)
+        } else {
+          const schoolRef = doc(db, "schools", adminDetails.schoolId)
+          const schoolSnap = await getDoc(schoolRef)
+
+          if (schoolSnap.exists()) {
+            const data = schoolSnap.data()
+            const school = {
+              id: schoolSnap.id,
+              name: data.name,
+              shortName: data.shortName,
+              admissions: data.admissions || 0,
+            }
+            setSchools([school])
+            setSchoolId(school.id)
+          } else {
+            failure("School not found for the current admin")
+          }
+        }
+      } catch (error) {
+        console.log(error)
+      }
     }
 
     fetchSchools()
@@ -104,7 +130,7 @@ const AddTeacher = () => {
       const selectedSchool = schools.find((s) => s.id === schoolId)
       await logActivity(
         `Successfully added teacher ${name} to ${selectedSchool?.name}`,
-        "Admin"
+        adminDetails.adminType !== "school-admin" ? "Admin" : "School"
       )
 
       success("Teacher added successfully!")
