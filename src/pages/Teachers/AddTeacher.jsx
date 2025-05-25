@@ -130,7 +130,7 @@ const AddTeacher = () => {
       const selectedSchool = schools.find((s) => s.id === schoolId)
       await logActivity(
         `Successfully added teacher ${name} to ${selectedSchool?.name}`,
-        adminDetails.adminType !== "school-admin" ? "Admin" : "School"
+        adminDetails.adminType !== "school-admin" ? "Admin" : "School Admin"
       )
 
       success("Teacher added successfully!")

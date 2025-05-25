@@ -16,7 +16,8 @@ const Students = () => {
     isOpen,
     success,
     failure,
-    fetchStudentsWithSchoolNames
+    fetchStudentsWithSchoolNames,
+    adminDetails,
   } = useContext(AppContext)
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -112,7 +113,7 @@ const Students = () => {
         studentName: formData.studentName,
         admissionNumber: formData.admissionNumber,
         classId: formData.classId,
-        sectionId: (formData.sectionId).toUpperCase(),
+        sectionId: formData.sectionId.toUpperCase(),
         studentEmail: formData.email,
         address: formData.address,
         dob: formData.dob,
@@ -125,7 +126,7 @@ const Students = () => {
       success(`Student ${formData.studentName} has been updated successfully`)
       await logActivity(
         `Successfully updated student ${formData.studentName}`,
-        "Admin"
+        adminDetails.adminType !== "school-admin" ? "Admin" : "School Admin"
       )
       setLoading(false)
     } catch (error) {
@@ -155,7 +156,7 @@ const Students = () => {
 
   useEffect(() => {
     fetchStudentsWithSchoolNames()
-  },[fetchStudentsWithSchoolNames])
+  }, [fetchStudentsWithSchoolNames])
 
   return (
     <div className={styles.adminLayout}>
@@ -349,7 +350,7 @@ const Students = () => {
                     type="text"
                     name="admissionNumber"
                     value={formData.admissionNumber}
-                    style={{cursor: 'not-allowed'}}
+                    style={{ cursor: "not-allowed" }}
                   />
                 </div>
 
@@ -359,7 +360,7 @@ const Students = () => {
                     type="text"
                     name="classId"
                     value={formData.classId}
-                    style={{cursor: 'not-allowed'}}
+                    style={{ cursor: "not-allowed" }}
                   />
                 </div>
 
@@ -379,7 +380,7 @@ const Students = () => {
                     type="email"
                     name="email"
                     value={formData.email}
-                    style={{cursor: 'not-allowed'}}
+                    style={{ cursor: "not-allowed" }}
                   />
                 </div>
 

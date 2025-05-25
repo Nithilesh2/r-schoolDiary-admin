@@ -208,7 +208,10 @@ const AppStore = ({ children }) => {
     try {
       await deleteDoc(doc(firestore, "teachers", teacher.id))
       setTeachers((prev) => prev.filter((t) => t.id !== teacher.id))
-      await logActivity("Successfully deleted teacher", "Admin")
+      await logActivity(
+        "Successfully deleted teacher",
+        adminDetails.adminType !== "school-admin" ? "Admin" : "School Admin"
+      )
       success("Teacher deleted successfully")
     } catch (error) {
       failure(`error getting deleting ${error}`)
@@ -219,6 +222,7 @@ const AppStore = ({ children }) => {
     <AppContext.Provider
       value={{
         adminDetails,
+        setAdminDetails,
 
         // Toastify
         success,

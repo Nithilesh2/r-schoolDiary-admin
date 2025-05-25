@@ -198,7 +198,7 @@ const AddStudent = () => {
 
       await logActivity(
         `Successfully added ${name} (Adm No: ${nextAdmissionNumber}) to ${schoolData.name}`,
-        "Admin"
+        adminDetails.adminType !== "school-admin" ? "Admin" : "School Admin"
       )
 
       success(`Student added successfully! Login email: ${studentEmail}`)

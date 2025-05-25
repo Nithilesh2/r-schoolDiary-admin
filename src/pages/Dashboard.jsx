@@ -33,6 +33,15 @@ const Dashboard = () => {
     return () => unsubscribe()
   }, [])
 
+  const getInitials = (name) => {
+    if (!name) return "?"
+    return name
+      .split(" ")
+      .map((word) => word[0]?.toUpperCase())
+      .join("")
+      .slice(0, 2)
+  }
+
   return (
     <div className={styles.adminLayout}>
       <Sidebar />
@@ -112,9 +121,7 @@ const Dashboard = () => {
                     return (
                       <div key={item.id} className={styles.activityItem}>
                         <div className={styles.activityAvatar}>
-                          <span>
-                            {item.user?.charAt(0).toUpperCase() || "?"}
-                          </span>
+                          <span title={item.user}>{getInitials(item.user) || "?"}</span>
                         </div>
                         <div className={styles.activityDetails}>
                           <p className={styles.activityTitle}>{item.action}</p>

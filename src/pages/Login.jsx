@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Lock, Mail, Eye, EyeOff, School, UserCog } from "lucide-react"
 import { signInWithEmailAndPassword } from "firebase/auth"
@@ -7,8 +7,10 @@ import logo from "../assets/favicon.png"
 import styles from "./Login.module.css"
 import { useCookies } from "react-cookie"
 import { collection, getDocs, query, where } from "firebase/firestore"
+import { AppContext } from "../context/AppContext"
 
 const Login = () => {
+  const { setAdminDetails } = useContext(AppContext)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -33,7 +35,6 @@ const Login = () => {
       console.log(user)
       const uid = user.user.uid
       if (uid === "LRRe7v5s8sSN1F31VFE6hflTnZP2") {
-        console.log("Navigating to dashboard")
         setCookies("userAuthenticated", user.user.uid, {
           path: "/",
           expires: new Date(new Date().getTime() + 15 * 60 * 1000),
@@ -61,6 +62,12 @@ const Login = () => {
           localStorage.setItem("uid", uid)
           localStorage.setItem("userType", userData.type)
           localStorage.setItem("schoolId", schoolDoc.id)
+
+          setAdminDetails({
+            uid: uid,
+            adminType: userData.type,
+            schoolId: schoolDoc.id,
+          })
 
           navigate("/", { replace: true })
         } else {
