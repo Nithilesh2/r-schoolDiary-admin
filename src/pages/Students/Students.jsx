@@ -341,6 +341,7 @@ const Students = () => {
                     name="studentName"
                     value={formData.studentName}
                     onChange={handleChange}
+                    required
                   />
                 </div>
 
@@ -371,6 +372,7 @@ const Students = () => {
                     name="sectionId"
                     value={formData.sectionId}
                     onChange={handleChange}
+                    required
                   />
                 </div>
 
@@ -391,6 +393,7 @@ const Students = () => {
                     name="dob"
                     value={formData.dob}
                     onChange={handleChange}
+                    required
                   />
                 </div>
 
@@ -400,6 +403,7 @@ const Students = () => {
                     name="bloodGroup"
                     value={formData.bloodGroup}
                     onChange={handleChange}
+                    required
                   >
                     <option value="">Select Blood Group</option>
                     <option value="A+">A+</option>
@@ -420,6 +424,7 @@ const Students = () => {
                     rows={3}
                     value={formData.address}
                     onChange={handleChange}
+                    required
                   ></textarea>
                 </div>
 
@@ -434,6 +439,7 @@ const Students = () => {
                     name="name"
                     value={formData.father.name}
                     onChange={(e) => handleParentChange(e, "father")}
+                    required
                   />
                 </div>
 
@@ -445,6 +451,7 @@ const Students = () => {
                     value={formData.father.phone}
                     onChange={(e) => handleParentChange(e, "father")}
                     maxLength={10}
+                    required
                   />
                 </div>
 
@@ -455,6 +462,7 @@ const Students = () => {
                     name="email"
                     value={formData.father.email}
                     onChange={(e) => handleParentChange(e, "father")}
+                    required
                   />
                 </div>
 
@@ -465,6 +473,7 @@ const Students = () => {
                     name="occupation"
                     value={formData.father.occupation}
                     onChange={(e) => handleParentChange(e, "father")}
+                    required
                   />
                 </div>
 
@@ -479,6 +488,7 @@ const Students = () => {
                     name="name"
                     value={formData.mother.name}
                     onChange={(e) => handleParentChange(e, "mother")}
+                    required
                   />
                 </div>
 
@@ -489,6 +499,7 @@ const Students = () => {
                     name="phone"
                     value={formData.mother.phone}
                     onChange={(e) => handleParentChange(e, "mother")}
+                    required
                     maxLength={10}
                   />
                 </div>
@@ -500,6 +511,7 @@ const Students = () => {
                     name="email"
                     value={formData.mother.email}
                     onChange={(e) => handleParentChange(e, "mother")}
+                    required
                   />
                 </div>
 
@@ -510,6 +522,7 @@ const Students = () => {
                     name="occupation"
                     value={formData.mother.occupation}
                     onChange={(e) => handleParentChange(e, "mother")}
+                    required
                   />
                 </div>
               </div>

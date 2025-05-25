@@ -278,7 +278,6 @@ const AddStudent = () => {
           <div className={styles.formCard}>
             <form onSubmit={handleSubmit}>
               <div className={styles.formGrid}>
-                {/* Student Basic Information */}
                 <div className={styles.formGroup}>
                   <label htmlFor="name">Full Name*</label>
                   <input
@@ -300,6 +299,7 @@ const AddStudent = () => {
                     name="dob"
                     value={dob}
                     onChange={(e) => setDob(e.target.value)}
+                    required
                   />
                 </div>
 
@@ -344,13 +344,14 @@ const AddStudent = () => {
                 <div className={styles.formGroup}>
                   <label htmlFor="class">Class*</label>
                   <input
-                    type="text"
+                    type='number'
                     id="class"
                     name="class"
                     placeholder="Enter class"
                     value={studentClass}
                     onChange={(e) => setStudentClass(e.target.value)}
                     required
+                    max={10}
                   />
                 </div>
 
@@ -360,14 +361,14 @@ const AddStudent = () => {
                     type="text"
                     id="section"
                     name="section"
-                    placeholder="Enter section ID"
+                    placeholder="Enter section"
                     value={sectionId}
                     onChange={(e) => setSectionId(e.target.value.toUpperCase())}
                     required
+                    maxLength={1}
                   />
                 </div>
 
-                {/* Auto-generated fields */}
                 <div className={styles.formGroup}>
                   <label htmlFor="admission">Admission Number</label>
                   <input
@@ -464,6 +465,7 @@ const AddStudent = () => {
                     placeholder="Enter father's email"
                     value={father.email}
                     onChange={handleFatherChange}
+                    required
                   />
                 </div>
 
@@ -476,6 +478,7 @@ const AddStudent = () => {
                     placeholder="Enter father's occupation"
                     value={father.occupation}
                     onChange={handleFatherChange}
+                    required
                   />
                 </div>
 
@@ -492,6 +495,7 @@ const AddStudent = () => {
                     placeholder="Enter mother's name"
                     value={mother.name}
                     onChange={handleMotherChange}
+                    required
                   />
                 </div>
 
@@ -505,6 +509,7 @@ const AddStudent = () => {
                     value={mother.phone}
                     onChange={handleMotherChange}
                     maxLength={10}
+                    required
                   />
                 </div>
 
@@ -517,6 +522,7 @@ const AddStudent = () => {
                     placeholder="Enter mother's email"
                     value={mother.email}
                     onChange={handleMotherChange}
+                    required
                   />
                 </div>
 
@@ -529,6 +535,7 @@ const AddStudent = () => {
                     placeholder="Enter mother's occupation"
                     value={mother.occupation}
                     onChange={handleMotherChange}
+                    required
                   />
                 </div>
 

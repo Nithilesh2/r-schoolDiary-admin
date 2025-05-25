@@ -7,7 +7,7 @@ import { AppContext } from "../context/AppContext"
 import { logActivity } from "../utils/logActivity"
 
 const EditTeacherModal = ({ teacher, onClose }) => {
-  const { success, failure } = useContext(AppContext)
+  const { success, failure, adminDetails } = useContext(AppContext)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -86,7 +86,7 @@ const EditTeacherModal = ({ teacher, onClose }) => {
       success(`Teacher ${formData.name} has updated successfully`)
       await logActivity(
         `Successfully updated teacher ${formData.name}`,
-        "Admin"
+        adminDetails.adminType !== "school-admin" ? "Admin" : "School Admin"
       )
       onClose()
       setLoading(false)
@@ -145,6 +145,7 @@ const EditTeacherModal = ({ teacher, onClose }) => {
                 onChange={handleChange}
                 placeholder="Enter phone number"
                 maxLength={10}
+                required
               />
             </div>
           </div>
