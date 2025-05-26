@@ -11,6 +11,8 @@ import { ToastContainer } from "react-toastify"
 import ActivitiesPage from "./pages/ActivitiesPage"
 import Login from "./pages/Login"
 import ProtectedRoute from "./pages/ProtectedRoute";
+import AcademicYearPromote from "./pages/AcademicYearPromote/AcademicYearPromote";
+import AcademicYearCurrent from "./pages/AcademicYearCurrent/AcademicYearCurrent";
 
 function App() {
   return (
@@ -79,6 +81,22 @@ function App() {
           element={
             <ProtectedRoute>
               <AddTeacher />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/academic-year/promote"
+          element={
+            <ProtectedRoute>
+              <AcademicYearPromote />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/academic-year/reports"
+          element={
+            <ProtectedRoute>
+              <AcademicYearCurrent />
             </ProtectedRoute>
           }
         />

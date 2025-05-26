@@ -9,6 +9,9 @@ import {
   updateDoc,
   arrayUnion,
   getDoc,
+  setDoc,
+  increment,
+  serverTimestamp,
 } from "firebase/firestore"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import Sidebar from "../../components/Sidebar"
@@ -82,7 +85,7 @@ const AddStudent = () => {
     }
 
     fetchSchools()
-  }, [])
+  }, [adminDetails])
 
   const generateShortName = (schoolName) => {
     return schoolName
@@ -187,6 +190,25 @@ const AddStudent = () => {
           admissionNumber: nextAdmissionNumber.toString(),
         }),
       })
+
+      const now = new Date()
+      const year =
+        now.getMonth() >= 4
+          ? `${now.getFullYear()}_${now.getFullYear() + 1}`
+          : `${now.getFullYear() - 1}_${now.getFullYear()}`
+      const reportRef = doc(db, "academicYearReports", schoolId)
+
+      await setDoc(
+        reportRef,
+        {
+          [year]: {
+            schoolId: schoolId,
+            totalStudents: increment(1),
+            updatedAt: serverTimestamp(),
+          },
+        },
+        { merge: true }
+      )
 
       setSchools((prevSchools) =>
         prevSchools.map((school) =>
@@ -344,7 +366,7 @@ const AddStudent = () => {
                 <div className={styles.formGroup}>
                   <label htmlFor="class">Class*</label>
                   <input
-                    type='number'
+                    type="number"
                     id="class"
                     name="class"
                     placeholder="Enter class"

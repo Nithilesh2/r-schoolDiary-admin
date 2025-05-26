@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useContext } from "react"
 import { firestore as db, auth } from "../../firebase/firebaseConfig"
-import { collection, getDocs, addDoc, doc, getDoc } from "firebase/firestore"
+import { collection, getDocs, addDoc, doc, getDoc, setDoc, increment, serverTimestamp } from "firebase/firestore"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import Sidebar from "../../components/Sidebar"
 import styles from "../Schools/styles/AddSchool.module.css"
@@ -61,7 +61,7 @@ const AddTeacher = () => {
     }
 
     fetchSchools()
-  }, [])
+  }, [adminDetails])
 
   const handleAssignmentChange = (index, field, value) => {
     const updatedAssignments = [...assignments]
@@ -126,6 +126,25 @@ const AddTeacher = () => {
         assignments,
         createdAt: new Date(),
       })
+
+      const now = new Date()
+      const year =
+        now.getMonth() >= 4
+          ? `${now.getFullYear()}_${now.getFullYear() + 1}`
+          : `${now.getFullYear() - 1}_${now.getFullYear()}`
+      const reportRef = doc(db, "academicYearReports", schoolId)
+
+      await setDoc(
+        reportRef,
+        {
+          [year]: {
+            schoolId: schoolId,
+            totalTeachers: increment(1),
+            updatedAt: serverTimestamp(),
+          },
+        },
+        { merge: true }
+      )
 
       const selectedSchool = schools.find((s) => s.id === schoolId)
       await logActivity(

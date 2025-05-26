@@ -10,6 +10,8 @@ import {
   CirclePlus,
   UserRound,
   GraduationCap,
+  CalendarCheck,
+  ChevronsUp
 } from "lucide-react"
 import styles from "./styles/Sidebar.module.css"
 import { AppContext } from "../context/AppContext"
@@ -89,6 +91,23 @@ const Sidebar = () => {
           name: "Add Student",
           path: "/students/add",
           icon: <CirclePlus size={18} />,
+        },
+      ],
+    },
+    {
+      name: "Academic Year",
+      path: "/academic-year",
+      icon: <CalendarCheck size={20} />,
+      dropdown: [
+        {
+          name: "Year End Reports",
+          path: "/academic-year/reports",
+          icon: <BookUser size={18} />,
+        },
+        {
+          name: "Promote Classes",
+          path: "/academic-year/promote",
+          icon: <ChevronsUp size={18} />,
         },
       ],
     },

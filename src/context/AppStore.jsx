@@ -131,7 +131,7 @@ const AppStore = ({ children }) => {
 
   useEffect(() => {
     fetchTeachersWithSchoolNames()
-  }, [])
+  }, [adminDetails])
 
   const filteredTeachers = teachers.filter((teacher) => {
     const name = teacher.name?.toLowerCase() || ""
@@ -185,7 +185,7 @@ const AppStore = ({ children }) => {
 
   useEffect(() => {
     fetchStudentsWithSchoolNames()
-  }, [])
+  }, [adminDetails])
 
   const filteredStudents = students.filter((student) => {
     const name = student.studentName?.toLowerCase() || ""
