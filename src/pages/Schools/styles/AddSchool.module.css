@@ -132,24 +132,20 @@
   border-top-color: white;
   animation: spin 1s ease-in-out infinite;
 }
-/* Add these to your existing CSS */
 .sectionHeader {
   margin: 20px 0 10px;
   padding-bottom: 8px;
   border-bottom: 1px solid #eee;
   color: #444;
 }
-
 .passwordInputContainer {
   position: relative;
   display: flex;
 }
-
 .passwordInputContainer input {
   flex: 1;
   padding-right: 70px;
 }
-
 .passwordToggle {
   position: absolute;
   right: 10px;
@@ -161,17 +157,14 @@
   cursor: pointer;
   font-size: 0.9rem;
 }
-
 .passwordToggle:hover {
   color: #333;
 }
-
 .passwordHint {
   font-size: 0.8rem;
   color: #666;
   margin-top: 5px;
 }
-
 input[readonly] {
   background-color: #f5f5f5;
   cursor: not-allowed;

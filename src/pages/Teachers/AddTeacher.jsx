@@ -1,7 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useContext } from "react"
 import { firestore as db, auth } from "../../firebase/firebaseConfig"
-import { collection, getDocs, addDoc, doc, getDoc, setDoc, increment, serverTimestamp } from "firebase/firestore"
+import {
+  collection,
+  getDocs,
+  addDoc,
+  doc,
+  getDoc,
+  setDoc,
+  increment,
+  serverTimestamp,
+} from "firebase/firestore"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 import Sidebar from "../../components/Sidebar"
 import styles from "../Schools/styles/AddSchool.module.css"
@@ -14,6 +23,7 @@ const AddTeacher = () => {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
+  const [dob, setDob] = useState("")
   const [schoolId, setSchoolId] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -123,6 +133,7 @@ const AddTeacher = () => {
         phone,
         schoolId,
         role: "teacher",
+        dob,
         assignments,
         createdAt: new Date(),
       })
@@ -176,6 +187,7 @@ const AddTeacher = () => {
     setPhone("")
     setSchoolId("")
     setPassword("")
+    setDob("")
     setAssignments([{ subject: "", class: "", section: "" }])
     setStep(1)
   }
@@ -202,7 +214,7 @@ const AddTeacher = () => {
               <form onSubmit={handleBasicInfoSubmit}>
                 <div className={styles.formGrid}>
                   <div className={styles.formGroup}>
-                    <label htmlFor="name">Teacher Name*</label>
+                    <label htmlFor="name">Teacher Full Name*</label>
                     <input
                       type="text"
                       id="name"
@@ -234,6 +246,18 @@ const AddTeacher = () => {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       maxLength={10}
+                      required
+                    />
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label htmlFor="dob">Date of Birth*</label>
+                    <input
+                      type="date"
+                      id="dob"
+                      name="dob"
+                      value={dob}
+                      onChange={(e) => setDob(e.target.value)} 
                       required
                     />
                   </div>

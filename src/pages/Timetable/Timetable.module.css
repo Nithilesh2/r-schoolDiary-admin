@@ -1,0 +1,156 @@
+.adminLayout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f9f9f9;
+}
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-x: auto;
+  transition: background-color,filter 0.3s linear;
+}
+.content {
+  padding: 2rem 1rem;
+}
+.header {
+  margin-bottom: 20px;
+}
+.header h2 {
+  font-size: 30px;
+  margin-bottom: 8px;
+  color: var(--indigo);
+}
+.header p {
+  font-size: 16px;
+  color: #666;
+}
+.controls {
+  margin-bottom: 20px;
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.column {
+  flex: 1 1 100%;
+  display: flex;
+  flex-direction: column;
+}
+.column label {
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.column select {
+  padding: 8px 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.timetableContainer {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+th {
+  background-color: #f0f0f0;
+  font-weight: 600;
+}
+.timetableCell {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.timetableCell:hover {
+  background-color: #f9f9f9;
+}
+.dialogOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dialog {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.dialogTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+.dialogContent {
+  margin-bottom: 16px;
+}
+.dialogContent label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.dialogContent select {
+  width: 100%;
+  padding: 8px;
+  font-size: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.dialogActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 15px;
+}
+.primary {
+  background-color: var(--indigo);
+  color: white;
+}
+.primary:disabled {
+  background-color: #90caf9;
+  cursor: not-allowed;
+}
+.danger {
+  background-color: #d32f2f;
+  color: white;
+}
+@media (min-width: 600px) {
+  .column {
+    flex: 1 1 45%;
+  }
+}
+@media (max-width: 650px) {
+  .mainContent{
+    margin-left: 4rem;
+  }
+  .blurredContent {
+    filter: blur(2px);
+    pointer-events: none;
+    user-select: none;
+    background-color: rgba(0, 0, 0, 0.1);
+    z-index: -1;
+  }
+}

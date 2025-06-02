@@ -11,7 +11,7 @@ import {
   UserRound,
   GraduationCap,
   CalendarCheck,
-  ChevronsUp
+  ChevronsUp,
 } from "lucide-react"
 import styles from "./styles/Sidebar.module.css"
 import { AppContext } from "../context/AppContext"
@@ -111,6 +111,15 @@ const Sidebar = () => {
         },
       ],
     },
+    ...(adminDetails.adminType === "school-admin"
+      ? [
+          {
+            name: "Timetable",
+            path: "/timetable",
+            icon: <CalendarCheck size={20} />,
+          },
+        ]
+      : []),
     {
       name: "Logout",
       action: "logout",

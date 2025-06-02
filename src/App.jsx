@@ -13,6 +13,7 @@ import Login from "./pages/Login"
 import ProtectedRoute from "./pages/ProtectedRoute";
 import AcademicYearPromote from "./pages/AcademicYearPromote/AcademicYearPromote";
 import AcademicYearCurrent from "./pages/AcademicYearCurrent/AcademicYearCurrent";
+import Timetable from "./pages/Timetable/Timetable";
 
 function App() {
   return (
@@ -81,6 +82,14 @@ function App() {
           element={
             <ProtectedRoute>
               <AddTeacher />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/timetable"
+          element={
+            <ProtectedRoute>
+              <Timetable />
             </ProtectedRoute>
           }
         />
