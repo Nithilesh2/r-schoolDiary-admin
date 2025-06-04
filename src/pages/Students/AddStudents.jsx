@@ -140,6 +140,7 @@ const AddStudent = () => {
       !address ||
       !schoolId ||
       !father.name ||
+      !father.email ||
       !father.phone
     ) {
       failure("Please fill all required fields")
@@ -195,24 +196,14 @@ const AddStudent = () => {
         },
       })
 
-      if (!useCustomAdmission) {
-        await updateDoc(schoolRef, {
-          admissions: admissionNum,
-          students: arrayUnion({
-            id: docRef.id,
-            name,
-            admissionNumber: admissionNum.toString(),
-          }),
-        })
-      } else {
-        await updateDoc(schoolRef, {
-          students: arrayUnion({
-            id: docRef.id,
-            name,
-            admissionNumber: admissionNum.toString(),
-          }),
-        })
-      }
+      await updateDoc(schoolRef, {
+        admissions: admissionNum,
+        students: arrayUnion({
+          id: docRef.id,
+          name,
+          admissionNumber: admissionNum.toString(),
+        }),
+      })
 
       const now = new Date()
       const year =
@@ -248,6 +239,23 @@ const AddStudent = () => {
 
       success(`Student added successfully! Login email: ${studentEmail}`)
 
+      await fetch(
+        "https://push-notifications-backend-ashen.vercel.app/api/sendSMS",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            toEmail: father.email,
+            username: studentEmail,
+            password: tempPass,
+            studentName: name,
+            fatherName: father.name,
+          }),
+        }
+      )
+
       setName("")
       setStudentClass("")
       setAddress("")
@@ -269,6 +277,7 @@ const AddStudent = () => {
         email: "",
         occupation: "",
       })
+      setLoading(false)
     } catch (error) {
       console.error("Error adding student: ", error)
       let errorMessage = "Error adding student"
