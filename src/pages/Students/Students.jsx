@@ -128,6 +128,30 @@ const Students = () => {
         `Successfully updated student ${formData.studentName}`,
         adminDetails.adminType !== "school-admin" ? "Admin" : "School Admin"
       )
+      const email =
+        formData.father.email?.trim() || formData.mother.email?.trim()
+      const fatherName = formData.father.name?.trim()
+      if (email) {
+        const schoolDomain = adminDetails.schoolDomain || "sshs.com"
+        const username = `${formData.admissionNumber}@${schoolDomain}`
+        const password = `${formData.admissionNumber}@123`
+        await fetch(
+          "https://push-notifications-backend-ashen.vercel.app/api/sendSMS",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              toEmail: email,
+              fatherName,
+              username,
+              password,
+              studentName: formData.studentName,
+            }),
+          }
+        )
+      }
       setLoading(false)
     } catch (error) {
       failure(error)
