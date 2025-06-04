@@ -13,30 +13,6 @@ import { firestore } from "../../firebase/firebaseConfig"
 import styles from "./Timetable.module.css"
 import Sidebar from "../../components/Sidebar"
 import { AppContext } from "../../context/AppContext"
-import {
-  Button,
-  CircularProgress,
-  MenuItem,
-  Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  Grid,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  FormControl,
-  InputLabel,
-  Box,
-} from "@mui/material"
-import { Add, Delete, Save } from "@mui/icons-material"
 
 const Timetable = () => {
   const { isOpen, adminDetails, success, failure } = useContext(AppContext)
@@ -140,7 +116,16 @@ const Timetable = () => {
 
         if (!timetableSnapshot.empty) {
           const docData = timetableSnapshot.docs[0].data()
-          setTimetable(docData.slots || [])
+          const existingSlots = docData.slots || []
+          const allSlots = days.flatMap((day) =>
+            periods.map((period) => {
+              const existingSlot = existingSlots.find(
+                (s) => s.day === day && s.period === period
+              )
+              return existingSlot || { day, period, teacher: "", subject: "" }
+            })
+          )
+          setTimetable(allSlots)
           setSelectedTimetableDocId(timetableSnapshot.docs[0].id)
         } else {
           const emptyTimetable = days.flatMap((day) =>
@@ -218,29 +203,24 @@ const Timetable = () => {
 
       setTimetable(updatedTimetable)
 
+      const timetableData = {
+        schoolId: adminDetails.schoolId,
+        class: selectedClass,
+        section: selectedSection,
+        slots: updatedTimetable,
+        lastUpdated: new Date(),
+      }
+
       if (selectedTimetableDocId) {
         const timetableRef = doc(
           firestore,
           "timetables",
           selectedTimetableDocId
         )
-        await setDoc(
-          timetableRef,
-          {
-            slots: updatedTimetable,
-            lastUpdated: new Date(),
-          },
-          { merge: true }
-        )
+        await setDoc(timetableRef, timetableData, { merge: true })
       } else {
         const timetableCollection = collection(firestore, "timetables")
-        const newDoc = await addDoc(timetableCollection, {
-          schoolId: adminDetails.schoolId,
-          class: selectedClass,
-          section: selectedSection,
-          slots: updatedTimetable,
-          lastUpdated: new Date(),
-        })
+        const newDoc = await addDoc(timetableCollection, timetableData)
         setSelectedTimetableDocId(newDoc.id)
       }
 
@@ -291,17 +271,6 @@ const Timetable = () => {
     }
   }
 
-  if (loading) {
-    return (
-      <div className={styles.adminLayout}>
-        <Sidebar />
-        <div className={styles.mainContentLoading}>
-          <CircularProgress />
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className={styles.adminLayout}>
       <Sidebar />
@@ -310,141 +279,197 @@ const Timetable = () => {
           isOpen ? styles.blurredContent : ""
         }`}
       >
-        <main className={styles.content}>
-          <div className={styles.header}>
-            <h2>School Timetable Management</h2>
-            <p>Create and manage class timetables</p>
-          </div>
-
-          <div className={styles.controls}>
-            <div className={styles.row}>
-              <div className={styles.column}>
-                <label>Class</label>
-                <select
-                  value={selectedClass}
-                  onChange={(e) => setSelectedClass(e.target.value)}
-                >
-                  <option value="" disabled>
-                    Select Class
-                  </option>
-                  {classes.map((cls) => (
-                    <option key={cls} value={cls}>
-                      {cls}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className={styles.column}>
-                <label>Section</label>
-                <select
-                  value={selectedSection}
-                  onChange={(e) => setSelectedSection(e.target.value)}
-                  disabled={!selectedClass}
-                >
-                  <option value="" disabled>
-                    Select Section
-                  </option>
-                  {sections.map((sec) => (
-                    <option key={sec} value={sec}>
-                      {sec}
-                    </option>
-                  ))}
-                </select>
-              </div>
+        {loading ? (
+          <main className={styles.content}>
+            <div className={styles.header}>
+              <div
+                className={`${styles.skeleton} ${styles.skeletonText}`}
+                style={{ width: "300px", height: "36px", marginBottom: "12px" }}
+              ></div>
+              <div
+                className={`${styles.skeleton} ${styles.skeletonText}`}
+                style={{ width: "250px", height: "20px" }}
+              ></div>
             </div>
-          </div>
 
-          {selectedClass && selectedSection && (
-            <div className={styles.timetableContainer}>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Day/Period</th>
-                    {periods.map((period) => (
-                      <th key={period}>{period}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {days.map((day) => (
-                    <tr key={day}>
-                      <td>{day}</td>
-                      {periods.map((period) => {
-                        const slot = timetable.find(
-                          (s) => s.day === day && s.period === period
-                        )
-                        const teacher = teachers.find(
-                          (t) => t.id === slot?.teacher
-                        )
-                        return (
-                          <td
-                            key={`${day}_${period}`}
-                            onClick={() => handleSlotClick(day, period)}
-                            className={styles.timetableCell}
-                          >
-                            {teacher && slot?.subject ? (
-                              <div>
-                                <div>{teacher.name}</div>
-                                <small style={{ color: "#666" }}>
-                                  {slot.subject}
-                                </small>
-                              </div>
-                            ) : (
-                              <span
-                                style={{ fontSize: "1.2em", color: "#888" }}
-                              >
-                                +
-                              </span>
-                            )}
-                          </td>
-                        )
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {openDialog && (
-            <div className={styles.dialogOverlay}>
-              <div className={styles.dialog}>
-                <div className={styles.dialogTitle}>
-                  Edit Timetable Slot - {currentSlot.day}, {currentSlot.period}
+            <div className={styles.controls}>
+              <div className={styles.row}>
+                <div className={styles.column}>
+                  <div
+                    className={`${styles.skeleton} ${styles.skeletonText}`}
+                    style={{
+                      width: "50px",
+                      height: "20px",
+                      marginBottom: "8px",
+                    }}
+                  ></div>
+                  <div
+                    className={`${styles.skeleton} ${styles.skeletonInput}`}
+                    style={{ height: "40px" }}
+                  ></div>
                 </div>
-                <div className={styles.dialogContent}>
-                  <label>Select Teacher and Subject</label>
+                <div className={styles.column}>
+                  <div
+                    className={`${styles.skeleton} ${styles.skeletonText}`}
+                    style={{
+                      width: "60px",
+                      height: "20px",
+                      marginBottom: "8px",
+                    }}
+                  ></div>
+                  <div
+                    className={`${styles.skeleton} ${styles.skeletonInput}`}
+                    style={{ height: "40px" }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.timetableContainer}>
+              <div
+                className={`${styles.skeleton} ${styles.skeletonTable}`}
+                style={{ height: "500px" }}
+              ></div>
+            </div>
+          </main>
+        ) : (
+          <main className={styles.content}>
+            <div className={styles.header}>
+              <h2>School Timetable Management</h2>
+              <p>Create and manage class timetables</p>
+            </div>
+
+            <div className={styles.controls}>
+              <div className={styles.row}>
+                <div className={styles.column}>
+                  <label>Class</label>
                   <select
-                    value={selectedTeacher}
-                    onChange={(e) => setSelectedTeacher(e.target.value)}
+                    value={selectedClass}
+                    onChange={(e) => setSelectedClass(e.target.value)}
                   >
                     <option value="" disabled>
-                      Select
+                      Select Class
                     </option>
-                    {teacherOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
+                    {classes.map((cls) => (
+                      <option key={cls} value={cls}>
+                        {cls}
                       </option>
                     ))}
                   </select>
                 </div>
-                <div className={styles.dialogActions}>
-                  <button onClick={handleDeleteSlot} className={styles.danger}>
-                    🗑️ Clear
-                  </button>
-                  <button onClick={() => setOpenDialog(false)}>Cancel</button>
-                  <button
-                    onClick={handleSaveSlot}
-                    disabled={!selectedTeacher}
-                    className={styles.primary}
+                <div className={styles.column}>
+                  <label>Section</label>
+                  <select
+                    value={selectedSection}
+                    onChange={(e) => setSelectedSection(e.target.value)}
+                    disabled={!selectedClass}
                   >
-                    💾 Save
-                  </button>
+                    <option value="" disabled>
+                      Select Section
+                    </option>
+                    {sections.map((sec) => (
+                      <option key={sec} value={sec}>
+                        {sec}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>
-          )}
-        </main>
+
+            {selectedClass && selectedSection && (
+              <div className={styles.timetableContainer}>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Day/Period</th>
+                      {periods.map((period) => (
+                        <th key={period}>{period}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {days.map((day) => (
+                      <tr key={day}>
+                        <td>{day}</td>
+                        {periods.map((period) => {
+                          const slot = timetable.find(
+                            (s) => s.day === day && s.period === period
+                          )
+                          const teacher = teachers.find(
+                            (t) => t.id === slot?.teacher
+                          )
+                          return (
+                            <td
+                              key={`${day}_${period}`}
+                              onClick={() => handleSlotClick(day, period)}
+                              className={styles.timetableCell}
+                            >
+                              {teacher && slot?.subject ? (
+                                <div>
+                                  <div>{teacher.name}</div>
+                                  <small style={{ color: "#666" }}>
+                                    {slot.subject}
+                                  </small>
+                                </div>
+                              ) : (
+                                <span
+                                  style={{ fontSize: "1.2em", color: "#888" }}
+                                >
+                                  +
+                                </span>
+                              )}
+                            </td>
+                          )
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {openDialog && (
+              <div className={styles.dialogOverlay}>
+                <div className={styles.dialog}>
+                  <div className={styles.dialogTitle}>
+                    Edit Timetable Slot - {currentSlot.day},{" "}
+                    {currentSlot.period}
+                  </div>
+                  <div className={styles.dialogContent}>
+                    <label>Select Teacher and Subject</label>
+                    <select
+                      value={selectedTeacher}
+                      onChange={(e) => setSelectedTeacher(e.target.value)}
+                    >
+                      <option value="">Select</option>
+                      {teacherOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className={styles.dialogActions}>
+                    <button
+                      onClick={handleDeleteSlot}
+                      className={styles.danger}
+                    >
+                      🗑️ Clear
+                    </button>
+                    <button onClick={() => setOpenDialog(false)}>Cancel</button>
+                    <button
+                      onClick={handleSaveSlot}
+                      disabled={!selectedTeacher}
+                      className={styles.primary}
+                    >
+                      💾 Save
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </main>
+        )}
       </div>
     </div>
   )

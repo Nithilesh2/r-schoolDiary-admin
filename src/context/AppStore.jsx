@@ -137,10 +137,12 @@ const AppStore = ({ children }) => {
     const name = teacher.name?.toLowerCase() || ""
     const email = teacher.email?.toLowerCase() || ""
     const school = teacher.schoolName?.toLowerCase() || ""
+    const phone = teacher.phone?.toLowerCase() || ""
     return (
       name.includes(searchTeacherTerm) ||
       email.includes(searchTeacherTerm) ||
-      school.includes(searchTeacherTerm)
+      school.includes(searchTeacherTerm) ||
+      phone.includes(searchTeacherTerm)
     )
   })
 
@@ -187,14 +189,17 @@ const AppStore = ({ children }) => {
     fetchStudentsWithSchoolNames()
   }, [adminDetails])
 
+  
   const filteredStudents = students.filter((student) => {
     const name = student.studentName?.toLowerCase() || ""
-    const email = student.email?.toLowerCase() || ""
+    const admissionNumber = student.admissionNumber?.toLowerCase() || ""
     const school = student.schoolName?.toLowerCase() || ""
+    const fatherName = student.parents?.father?.name?.toLowerCase() || ""
     return (
       name.includes(searchStudentTerm) ||
-      email.includes(searchStudentTerm) ||
-      school.includes(searchStudentTerm)
+      admissionNumber.includes(searchStudentTerm) ||
+      school.includes(searchStudentTerm) ||
+      fatherName.includes(searchStudentTerm)
     )
   })
 

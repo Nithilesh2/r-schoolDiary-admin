@@ -181,7 +181,7 @@ const Students = () => {
                 <Search className={styles.searchIcon} size={18} />
                 <input
                   type="text"
-                  placeholder="Search students | mail | school | parents"
+                  placeholder="Search students | school | Father Name"
                   value={searchStudentTerm}
                   onChange={(e) => setSearchStudentTerm(e.target.value)}
                 />

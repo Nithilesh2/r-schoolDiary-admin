@@ -70,7 +70,7 @@ const Teachers = () => {
                 <Search className={styles.searchIcon} size={18} />
                 <input
                   type="text"
-                  placeholder="Search teacher | mail | school"
+                  placeholder="Search Teacher | Mail | Phone | School"
                   value={searchTeacherTerm}
                   onChange={(e) =>
                     setSearchTeacherTerm(e.target.value.toLowerCase())

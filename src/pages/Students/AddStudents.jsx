@@ -32,6 +32,8 @@ const AddStudent = () => {
   const [admissionNumber, setAdmissionNumber] = useState("")
   const [tempPassword, setTempPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [useCustomAdmission, setUseCustomAdmission] = useState(false)
+  const [customAdmissionNumber, setCustomAdmissionNumber] = useState("")
 
   const [dob, setDob] = useState("")
   const [bloodGroup, setBloodGroup] = useState("")
@@ -100,11 +102,15 @@ const AddStudent = () => {
       const selectedSchool = schools.find((school) => school.id === schoolId)
       if (selectedSchool) {
         const nextAdmissionNumber = (selectedSchool.admissions || 0) + 1
-        setAdmissionNumber(nextAdmissionNumber.toString())
-        setTempPassword(`${nextAdmissionNumber}${selectedSchool.shortName}@123`)
+        if (!useCustomAdmission) {
+          setAdmissionNumber(nextAdmissionNumber.toString())
+          setTempPassword(
+            `${nextAdmissionNumber}${selectedSchool.shortName}@123`
+          )
+        }
       }
     }
-  }, [schoolId, schools])
+  }, [schoolId, schools, useCustomAdmission])
 
   const handleFatherChange = (e) => {
     const { name, value } = e.target
@@ -124,7 +130,10 @@ const AddStudent = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-
+    if (useCustomAdmission && !customAdmissionNumber) {
+      failure("Please enter a custom admission number")
+      return
+    }
     if (
       !name ||
       !studentClass ||
@@ -133,7 +142,7 @@ const AddStudent = () => {
       !father.name ||
       !father.phone
     ) {
-      alert("Please fill all required fields")
+      failure("Please fill all required fields")
       return
     }
 
@@ -150,20 +159,24 @@ const AddStudent = () => {
       const schoolData = schoolSnap.data()
       const schoolShortName =
         schoolData.shortName || generateShortName(schoolData.name)
-      const nextAdmissionNumber = (schoolData.admissions || 0) + 1
 
-      const studentEmail = `${nextAdmissionNumber}@${schoolShortName}.com`
+      const admissionNum = useCustomAdmission
+        ? parseInt(customAdmissionNumber)
+        : (schoolData.admissions || 0) + 1
+
+      const studentEmail = `${admissionNum}@${schoolShortName}.com`
+      const tempPass = `${admissionNum}${schoolShortName}@123`
 
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         studentEmail,
-        tempPassword
+        tempPass
       )
       const userId = userCredential.user.uid
 
       const docRef = await addDoc(collection(db, "students"), {
         uid: userId,
-        admissionNumber: nextAdmissionNumber.toString(),
+        admissionNumber: admissionNum.toString(),
         classId: studentClass,
         studentName: name,
         studentEmail,
@@ -182,14 +195,24 @@ const AddStudent = () => {
         },
       })
 
-      await updateDoc(schoolRef, {
-        admissions: nextAdmissionNumber,
-        students: arrayUnion({
-          id: docRef.id,
-          name,
-          admissionNumber: nextAdmissionNumber.toString(),
-        }),
-      })
+      if (!useCustomAdmission) {
+        await updateDoc(schoolRef, {
+          admissions: admissionNum,
+          students: arrayUnion({
+            id: docRef.id,
+            name,
+            admissionNumber: admissionNum.toString(),
+          }),
+        })
+      } else {
+        await updateDoc(schoolRef, {
+          students: arrayUnion({
+            id: docRef.id,
+            name,
+            admissionNumber: admissionNum.toString(),
+          }),
+        })
+      }
 
       const now = new Date()
       const year =
@@ -213,13 +236,13 @@ const AddStudent = () => {
       setSchools((prevSchools) =>
         prevSchools.map((school) =>
           school.id === schoolId
-            ? { ...school, admissions: nextAdmissionNumber }
+            ? { ...school, admissions: admissionNum }
             : school
         )
       )
 
       await logActivity(
-        `Successfully added ${name} (Adm No: ${nextAdmissionNumber}) to ${schoolData.name}`,
+        `Successfully added ${name} (Adm No: ${admissionNum}) to ${schoolData.name}`,
         adminDetails.adminType !== "school-admin" ? "Admin" : "School Admin"
       )
 
@@ -391,59 +414,126 @@ const AddStudent = () => {
                   />
                 </div>
 
-                <div className={styles.formGroup}>
-                  <label htmlFor="admission">Admission Number</label>
-                  <input
-                    type="text"
-                    id="admission"
-                    name="admission"
-                    value={admissionNumber}
-                    readOnly
-                    className={styles.readOnlyInput}
-                    style={{ cursor: "not-allowed" }}
-                  />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label>Student Email (Auto-generated)</label>
-                  <input
-                    type="text"
-                    value={
-                      schoolId && admissionNumber
-                        ? `${admissionNumber}@${
-                            schools.find((s) => s.id === schoolId)?.shortName
-                          }.com`
-                        : "Select school first"
-                    }
-                    readOnly
-                    className={styles.readOnlyInput}
-                    style={{ cursor: "not-allowed" }}
-                  />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label>Temporary Password</label>
-                  <div className={styles.passContainer}>
+                <div className={styles.autoGeneratedValues}>
+                  <div className={styles.toggleContainer}>
+                    <label htmlFor="customAdmissionToggle">
+                      Use Custom Admission Number
+                    </label>
                     <input
-                      type={showPassword ? "text" : "password"}
-                      value={tempPassword}
+                      type="checkbox"
+                      id="customAdmissionToggle"
+                      checked={useCustomAdmission}
+                      onChange={(e) => {
+                        setUseCustomAdmission(e.target.checked)
+                        if (!e.target.checked) {
+                          const selectedSchool = schools.find(
+                            (school) => school.id === schoolId
+                          )
+                          if (selectedSchool) {
+                            const nextAdmissionNumber =
+                              (selectedSchool.admissions || 0) + 1
+                            setAdmissionNumber(nextAdmissionNumber.toString())
+                            setTempPassword(
+                              `${nextAdmissionNumber}${selectedSchool.shortName}@123`
+                            )
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+
+                  {useCustomAdmission ? (
+                    <div
+                      className={styles.formGroup}
+                      style={{ marginTop: "20px" }}
+                    >
+                      <label htmlFor="customAdmission">
+                        Custom Admission Number*
+                      </label>
+                      <input
+                        type="number"
+                        id="customAdmission"
+                        name="customAdmission"
+                        value={customAdmissionNumber}
+                        min={0}
+                        onChange={(e) => {
+                          setCustomAdmissionNumber(e.target.value)
+                          setAdmissionNumber(e.target.value)
+                          const selectedSchool = schools.find(
+                            (school) => school.id === schoolId
+                          )
+                          if (selectedSchool) {
+                            setTempPassword(
+                              `${e.target.value}${selectedSchool.shortName}@123`
+                            )
+                          }
+                        }}
+                        required
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className={styles.formGroup}
+                      style={{ marginTop: "20px" }}
+                    >
+                      <label htmlFor="admission">
+                        Admission Number (Auto-generated)
+                      </label>
+                      <input
+                        type="text"
+                        id="admission"
+                        name="admission"
+                        value={admissionNumber}
+                        readOnly
+                        className={styles.readOnlyInput}
+                        style={{ cursor: "not-allowed" }}
+                      />
+                    </div>
+                  )}
+
+                  <div className={styles.formGroup}>
+                    <label>Student Email (Auto-generated)</label>
+                    <input
+                      type="text"
+                      value={
+                        schoolId && admissionNumber
+                          ? `${admissionNumber}@${
+                              schools.find((s) => s.id === schoolId)?.shortName
+                            }.com`
+                          : `****@${
+                              schools.find((s) => s.id === schoolId)?.shortName
+                            }.com`
+                      }
                       readOnly
                       className={styles.readOnlyInput}
                       style={{ cursor: "not-allowed" }}
                     />
-                    {showPassword ? (
-                      <EyeOff
-                        size={16}
-                        className={styles.eye}
-                        onClick={() => setShowPassword(!showPassword)}
+                  </div>
+
+                  <div className={styles.formGroup}>
+                    <label>Temporary Password</label>
+                    <div className={styles.passContainer}>
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={tempPassword}
+                        readOnly
+                        className={styles.readOnlyInput}
+                        style={{ cursor: "not-allowed" }}
                       />
-                    ) : (
-                      <Eye
-                        size={16}
-                        className={styles.eye}
-                        onClick={() => setShowPassword(!showPassword)}
-                      />
-                    )}
+                      {showPassword ? (
+                        <EyeOff
+                          size={16}
+                          className={styles.eye}
+                          onClick={() => setShowPassword(!showPassword)}
+                        />
+                      ) : (
+                        <Eye
+                          size={16}
+                          className={styles.eye}
+                          onClick={() => setShowPassword(!showPassword)}
+                        />
+                      )}
+                    </div>
                   </div>
                 </div>
 
