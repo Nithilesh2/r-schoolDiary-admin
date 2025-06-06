@@ -1,0 +1,291 @@
+.adminLayout {
+  display: flex;
+  min-height: 100vh;
+}
+.container {
+  max-width: 1200px;
+  padding: 20px;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  color: var(--indigo);
+}
+
+.filterContainer {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.filterGroup {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filterLabel {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #4a5568;
+}
+
+.filterInput {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+}
+
+.applyButton {
+  align-self: flex-end;
+  padding: 0.5rem 1rem;
+  background-color: var(--indigo);
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.applyButton:hover {
+  background-color: var(--indigoHover);
+}
+
+.studentsList {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+.listTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #2d3748;
+}
+
+.studentItem {
+  padding: 1rem;
+  border-bottom: 1px solid #edf2f7;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-radius: 10px;
+}
+
+.studentItem:hover {
+  background-color: var(--background);
+}
+
+.studentHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.studentName {
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.studentClass {
+  font-size: 0.875rem;
+  color: #718096;
+}
+
+.statusContainer {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.statusBadge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.paidStatus {
+  background-color: #f0fff4;
+  color: #38a169;
+}
+
+.pendingStatus {
+  background-color: #fffaf0;
+  color: #dd6b20;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem;
+  z-index: 50;
+  overflow-y: auto;
+}
+.modalContent {
+  background-color: white;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 28rem;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.5rem;
+}
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem 0;
+  border-bottom: 1px solid #edf2f7;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 10;
+  border-radius: 0.5rem;
+}
+.modalBody {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+.modalTitles{
+  display: flex;
+  flex-direction: column;
+}
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--indigo);
+}
+.closeButton {
+  color: #718096;
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+.studentInfo {
+  color: #718096;
+  margin-bottom: 1.5rem;
+}
+
+.termCard {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.termTitle {
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #2d3748;
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.detailLabel {
+  font-size: 0.875rem;
+  color: #718096;
+}
+
+.detailValue {
+  font-weight: 500;
+}
+
+.statusValue {
+  font-weight: 600;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.actionButton {
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.paidButton {
+  background-color: #48bb78;
+  color: white;
+}
+
+.paidButton:hover {
+  background-color: #38a169;
+}
+
+.paidButton:disabled {
+  background-color: #e2e8f0;
+  cursor: not-allowed;
+}
+
+.pendingButton {
+  background-color: #ed8936;
+  color: white;
+}
+
+.pendingButton:hover {
+  background-color: #dd6b20;
+}
+
+.pendingButton:disabled {
+  background-color: #e2e8f0;
+  cursor: not-allowed;
+}
+.partialPaymentContainer {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.partialPaymentInput {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.partialPaymentButton {
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: #4299e1;
+  color: white;
+  border: none;
+  transition: background-color 0.2s;
+}
+
+.partialPaymentButton:hover {
+  background-color: #3182ce;
+}

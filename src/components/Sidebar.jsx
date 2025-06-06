@@ -12,6 +12,8 @@ import {
   GraduationCap,
   CalendarCheck,
   ChevronsUp,
+  Clock,
+  DollarSign,
 } from "lucide-react"
 import styles from "./styles/Sidebar.module.css"
 import { AppContext } from "../context/AppContext"
@@ -116,7 +118,12 @@ const Sidebar = () => {
           {
             name: "Timetable",
             path: "/timetable",
-            icon: <CalendarCheck size={20} />,
+            icon: <Clock  size={20} />,
+          },
+          {
+            name: "Fees",
+            path: "/fees",
+            icon: <DollarSign size={20} />,
           },
         ]
       : []),

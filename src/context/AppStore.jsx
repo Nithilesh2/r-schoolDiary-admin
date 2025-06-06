@@ -189,7 +189,6 @@ const AppStore = ({ children }) => {
     fetchStudentsWithSchoolNames()
   }, [adminDetails])
 
-  
   const filteredStudents = students.filter((student) => {
     const name = student.studentName?.toLowerCase() || ""
     const admissionNumber = student.admissionNumber?.toLowerCase() || ""
@@ -223,11 +222,22 @@ const AppStore = ({ children }) => {
     }
   }
 
+  const formatIndianNumber = (value) => {
+    if (!value) return ""
+    const x = value.replace(/[^0-9]/g, "")
+    const lastThree = x.slice(-3)
+    const otherNumbers = x.slice(0, -3)
+    return otherNumbers
+      ? otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + "," + lastThree
+      : lastThree
+  }
+
   return (
     <AppContext.Provider
       value={{
         adminDetails,
         setAdminDetails,
+        formatIndianNumber,
 
         // Toastify
         success,

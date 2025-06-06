@@ -21,12 +21,14 @@ import { AppContext } from "../../context/AppContext"
 import { Eye, EyeOff } from "lucide-react"
 
 const AddStudent = () => {
-  const { isOpen, success, failure, adminDetails } = useContext(AppContext)
+  const { isOpen, success, failure, adminDetails, formatIndianNumber } =
+    useContext(AppContext)
   const [name, setName] = useState("")
   const [studentClass, setStudentClass] = useState("")
   const [address, setAddress] = useState("")
   const [schoolId, setSchoolId] = useState("")
   const [schools, setSchools] = useState([])
+  const [totalFee, setTotalFee] = useState("")
   const [sectionId, setSectionId] = useState("")
   const [loading, setLoading] = useState(false)
   const [admissionNumber, setAdmissionNumber] = useState("")
@@ -150,6 +152,7 @@ const AddStudent = () => {
     try {
       setLoading(true)
 
+      const halfFee = Number(totalFee) / 2
       const schoolRef = doc(db, "schools", schoolId)
       const schoolSnap = await getDoc(schoolRef)
 
@@ -193,6 +196,19 @@ const AddStudent = () => {
         parents: {
           father,
           mother,
+        },
+        fees: {
+          totalFee: totalFee,
+          term1: {
+            amount: halfFee,
+            paidAmount: 0,
+            status: "pending",
+          },
+          term2: {
+            amount: halfFee,
+            paidAmount: 0,
+            status: "pending",
+          },
         },
       })
 
@@ -544,6 +560,24 @@ const AddStudent = () => {
                       )}
                     </div>
                   </div>
+                </div>
+
+                <div className={styles.sectionDivider}>
+                  <span>Fee Details</span>
+                </div>
+                <div className={styles.formGroup}>
+                  <label htmlFor="totalFee">Total Fee (for both terms)</label>
+                  <input
+                    type="text"
+                    id="totalFee"
+                    placeholder="Enter total fee"
+                    value={formatIndianNumber(totalFee)}
+                    onChange={(e) => {
+                      const onlyNums = e.target.value.replace(/[^0-9]/g, "")
+                      setTotalFee(onlyNums)
+                    }}
+                    required
+                  />
                 </div>
 
                 <div className={styles.sectionDivider}>
