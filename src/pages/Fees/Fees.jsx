@@ -13,7 +13,7 @@ import Sidebar from "../../components/Sidebar"
 import { AppContext } from "../../context/AppContext"
 
 const Fees = () => {
-  const { formatIndianNumber } = useContext(AppContext)
+  const { formatIndianNumber, isOpen } = useContext(AppContext)
   const [students, setStudents] = useState([])
   const [selectedStudent, setSelectedStudent] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -154,7 +154,11 @@ const Fees = () => {
   return (
     <div className={styles.adminLayout}>
       <Sidebar />
-      <div className={styles.container}>
+      <div
+        className={`${styles.mainContent} ${
+          isOpen ? styles.blurredContent : ""
+        }`}
+      >
         <h1 className={styles.title}>Student Fees Management</h1>
 
         <div className={styles.filterContainer}>
@@ -277,6 +281,12 @@ const Fees = () => {
               </div>
 
               <div className={styles.modalBody}>
+                <div className={styles.modalTotalFee}>
+                  Total Fee:{" "}
+                  {selectedStudent.fees.totalFee
+                    ? selectedStudent.fees.totalFee
+                    : 0}
+                </div>
                 <div>
                   <div className={styles.termCard}>
                     <h4 className={styles.termTitle}>Term 1 Fees</h4>

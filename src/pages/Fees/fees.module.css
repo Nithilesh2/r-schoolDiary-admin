@@ -2,30 +2,29 @@
   display: flex;
   min-height: 100vh;
 }
-.container {
-  max-width: 1200px;
-  padding: 20px;
+.mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: background-color, filter 0.3s linear;
+  padding: 2rem 0.7rem;
 }
-
 .title {
   font-size: 2rem;
   font-weight: bold;
   margin-bottom: 1.5rem;
   color: var(--indigo);
 }
-
 .filterContainer {
   display: flex;
   gap: 1rem;
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }
-
 .filterGroup {
   flex: 1;
   min-width: 200px;
 }
-
 .filterLabel {
   display: block;
   font-size: 0.875rem;
@@ -33,7 +32,6 @@
   margin-bottom: 0.5rem;
   color: #4a5568;
 }
-
 .filterInput {
   width: 100%;
   padding: 0.5rem 1rem;
@@ -41,7 +39,6 @@
   border-radius: 0.375rem;
   font-size: 1rem;
 }
-
 .applyButton {
   align-self: flex-end;
   padding: 0.5rem 1rem;
@@ -52,25 +49,21 @@
   cursor: pointer;
   transition: background-color 0.2s;
 }
-
 .applyButton:hover {
   background-color: var(--indigoHover);
 }
-
 .studentsList {
   background-color: white;
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
 }
-
 .listTitle {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 1rem;
   color: #2d3748;
 }
-
 .studentItem {
   padding: 1rem;
   border-bottom: 1px solid #edf2f7;
@@ -78,50 +71,41 @@
   transition: background-color 0.2s;
   border-radius: 10px;
 }
-
 .studentItem:hover {
   background-color: var(--background);
 }
-
 .studentHeader {
   display: flex;
   justify-content: space-between;
   margin-bottom: 0.5rem;
 }
-
 .studentName {
   font-weight: 500;
   color: #2d3748;
 }
-
 .studentClass {
   font-size: 0.875rem;
   color: #718096;
 }
-
 .statusContainer {
   display: flex;
   gap: 1rem;
   margin-top: 0.5rem;
 }
-
 .statusBadge {
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   font-size: 0.75rem;
   font-weight: 500;
 }
-
 .paidStatus {
   background-color: #f0fff4;
   color: #38a169;
 }
-
 .pendingStatus {
   background-color: #fffaf0;
   color: #dd6b20;
 }
-
 .modalOverlay {
   position: fixed;
   top: 0;
@@ -163,7 +147,7 @@
   overflow-y: auto;
   flex-grow: 1;
 }
-.modalTitles{
+.modalTitles {
   display: flex;
   flex-direction: column;
 }
@@ -171,6 +155,9 @@
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--indigo);
+}
+.modalTotalFee{
+  margin-bottom: 10px;
 }
 .closeButton {
   color: #718096;
@@ -183,46 +170,38 @@
   color: #718096;
   margin-bottom: 1.5rem;
 }
-
 .termCard {
   border: 1px solid #e2e8f0;
   border-radius: 0.5rem;
   padding: 1rem;
   margin-bottom: 1rem;
 }
-
 .termTitle {
   font-weight: 600;
   margin-bottom: 0.75rem;
   color: #2d3748;
 }
-
 .detailsGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   margin-bottom: 1rem;
 }
-
 .detailLabel {
   font-size: 0.875rem;
   color: #718096;
 }
-
 .detailValue {
   font-weight: 500;
 }
-
 .statusValue {
   font-weight: 600;
 }
-
 .buttonGroup {
   display: flex;
   gap: 0.5rem;
   margin-top: 1rem;
 }
-
 .actionButton {
   padding: 0.375rem 0.75rem;
   border-radius: 0.25rem;
@@ -232,30 +211,24 @@
   border: none;
   transition: background-color 0.2s;
 }
-
 .paidButton {
   background-color: #48bb78;
   color: white;
 }
-
 .paidButton:hover {
   background-color: #38a169;
 }
-
 .paidButton:disabled {
   background-color: #e2e8f0;
   cursor: not-allowed;
 }
-
 .pendingButton {
   background-color: #ed8936;
   color: white;
 }
-
 .pendingButton:hover {
   background-color: #dd6b20;
 }
-
 .pendingButton:disabled {
   background-color: #e2e8f0;
   cursor: not-allowed;
@@ -265,7 +238,6 @@
   padding-top: 1rem;
   border-top: 1px solid #e2e8f0;
 }
-
 .partialPaymentInput {
   width: 100%;
   padding: 0.5rem;
@@ -273,7 +245,6 @@
   border-radius: 0.25rem;
   margin-bottom: 0.5rem;
 }
-
 .partialPaymentButton {
   padding: 0.375rem 0.75rem;
   border-radius: 0.25rem;
@@ -285,7 +256,18 @@
   border: none;
   transition: background-color 0.2s;
 }
-
 .partialPaymentButton:hover {
   background-color: #3182ce;
+}
+@media only screen and (max-width: 650px) {
+  .mainContent {
+    margin-left: 5rem;
+  }
+  .blurredContent {
+    filter: blur(2px);
+    pointer-events: none;
+    user-select: none;
+    background-color: rgba(0, 0, 0, 0.1);
+    z-index: -1;
+  }
 }
