@@ -118,12 +118,24 @@ const Sidebar = () => {
           {
             name: "Timetable",
             path: "/timetable",
-            icon: <Clock  size={20} />,
+            icon: <Clock size={20} />,
           },
           {
             name: "Fees",
             path: "/fees",
             icon: <DollarSign size={20} />,
+            dropdown: [
+              {
+                name: "Set Total Fees",
+                path: "/fees/set-total-fees",
+                icon: <CirclePlus size={18} />,
+              },
+              {
+                name: "Manage Fees",
+                path: "/fees/manage-fees",
+                icon: <DollarSign size={18} />,
+              },
+            ],
           },
         ]
       : []),

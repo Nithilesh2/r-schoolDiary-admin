@@ -232,12 +232,21 @@ const AppStore = ({ children }) => {
       : lastThree
   }
 
+  const getCurrentAcademicYear = () => {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = now.getMonth() + 1
+
+    return month < 6 ? `${year - 1}-${year}` : `${year}-${year + 1}`
+  }
+
   return (
     <AppContext.Provider
       value={{
         adminDetails,
         setAdminDetails,
         formatIndianNumber,
+        getCurrentAcademicYear,
 
         // Toastify
         success,

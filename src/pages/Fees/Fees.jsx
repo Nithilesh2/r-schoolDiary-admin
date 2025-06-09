@@ -13,7 +13,7 @@ import Sidebar from "../../components/Sidebar"
 import { AppContext } from "../../context/AppContext"
 
 const Fees = () => {
-  const { formatIndianNumber, isOpen } = useContext(AppContext)
+  const { isOpen } = useContext(AppContext)
   const [students, setStudents] = useState([])
   const [selectedStudent, setSelectedStudent] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -23,13 +23,21 @@ const Fees = () => {
     section: "",
   })
   const [hasSearched, setHasSearched] = useState(false)
+  const [partialPayment, setPartialPayment] = useState({
+    term: "",
+    amount: "",
+    isPreviousClass: false,
+  })
 
   const fetchStudents = async () => {
     if (!filters.class || !filters.section) return
 
     try {
       setLoading(true)
-      let q = query(
+      const currentClass = parseInt(filters.class)
+      const previousClass = currentClass - 1
+
+      const q = query(
         collection(db, "students"),
         where("classId", "==", filters.class),
         where("sectionId", "==", filters.section)
@@ -37,19 +45,45 @@ const Fees = () => {
 
       const querySnapshot = await getDocs(q)
       const studentsData = []
-      querySnapshot.forEach((doc) => {
+
+      for (const doc of querySnapshot.docs) {
         const data = doc.data()
-        if (!data.fees) {
-          data.fees = {
-            term1: { amount: 0, dueDate: "", paidAmount: 0, status: "pending" },
-            term2: { amount: 0, dueDate: "", paidAmount: 0, status: "pending" },
-          }
+        const feeHistory = data.feeHistory || {}
+
+        const currentFeeData = feeHistory[`classId${currentClass}`] || {
+          term1: { amount: 0, paidAmount: 0, status: "pending", dueDate: "" },
+          term2: { amount: 0, paidAmount: 0, status: "pending", dueDate: "" },
+          totalFee: 0,
+          updatedAt: new Date(),
         }
-        studentsData.push({ id: doc.id, ...data })
-      })
+
+        let previousTerm1Pending = 0
+        let previousTerm2Pending = 0
+        let previousFeeData = {}
+        if (previousClass > 0 && feeHistory[`classId${previousClass}`]) {
+          previousFeeData = feeHistory[`classId${previousClass}`]
+          previousTerm1Pending =
+            previousFeeData.term1.amount - previousFeeData.term1.paidAmount
+          previousTerm2Pending =
+            previousFeeData.term2.amount - previousFeeData.term2.paidAmount
+        }
+
+        studentsData.push({
+          id: doc.id,
+          ...data,
+          feeHistory,
+          currentFeeData,
+          previousFeeData,
+          previousPending: {
+            term1: previousTerm1Pending,
+            term2: previousTerm2Pending,
+            total: previousTerm1Pending + previousTerm2Pending,
+          },
+        })
+      }
+
       setStudents(studentsData)
       setHasSearched(true)
-      setLoading(false)
     } catch (error) {
       console.error("Error fetching students:", error)
     } finally {
@@ -57,47 +91,62 @@ const Fees = () => {
     }
   }
 
-  const updateFeeStatus = async (term, status) => {
+  const updateFeeStatus = async (term, status, isPreviousClass = false) => {
     if (!selectedStudent) return
 
     try {
+      setLoading(true)
       const studentRef = doc(db, "students", selectedStudent.id)
+      const classToUpdate = isPreviousClass
+        ? parseInt(selectedStudent.classId) - 1
+        : parseInt(selectedStudent.classId)
+
+      if (classToUpdate < 1) return // No previous class for class 1
+
+      const feeKey = `classId${classToUpdate}`
+      const currentFeeData = selectedStudent.feeHistory?.[feeKey] || {
+        term1: { amount: 0, paidAmount: 0, status: "pending", dueDate: "" },
+        term2: { amount: 0, paidAmount: 0, status: "pending", dueDate: "" },
+        totalFee: 0,
+      }
+
+      const updatedTerm = {
+        ...currentFeeData[term],
+        status,
+        paidAmount: status === "paid" ? currentFeeData[term].amount : 0,
+      }
+
       const updatedFees = {
-        ...selectedStudent.fees,
-        [term]: {
-          ...selectedStudent.fees[term],
-          status: status,
-          paidAmount: status === "paid" ? selectedStudent.fees[term].amount : 0,
-        },
+        ...currentFeeData,
+        [term]: updatedTerm,
+        updatedAt: new Date(),
       }
 
       await updateDoc(studentRef, {
-        fees: updatedFees,
+        [`feeHistory.${feeKey}`]: updatedFees,
+        lastFeeUpdate: new Date(),
       })
 
-      setSelectedStudent({
+      const updatedStudent = {
         ...selectedStudent,
-        fees: updatedFees,
-      })
+        feeHistory: {
+          ...selectedStudent.feeHistory,
+          [feeKey]: updatedFees,
+        },
+      }
 
-      setStudents(
-        students.map((student) =>
-          student.id === selectedStudent.id
-            ? { ...student, fees: updatedFees }
-            : student
-        )
+      setSelectedStudent(updatedStudent)
+      setStudents((prev) =>
+        prev.map((s) => (s.id === selectedStudent.id ? updatedStudent : s))
       )
     } catch (error) {
       console.error("Error updating fee status:", error)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const [partialPayment, setPartialPayment] = useState({
-    term: "",
-    amount: "",
-  })
-
-  const handlePartialPayment = async (term) => {
+  const handlePartialPayment = async (term, isPreviousClass = false) => {
     if (
       !selectedStudent ||
       !partialPayment.amount ||
@@ -106,48 +155,190 @@ const Fees = () => {
       return
 
     try {
-      const paymentAmount = parseFloat(partialPayment.amount)
+      setLoading(true)
       const studentRef = doc(db, "students", selectedStudent.id)
+      const classToUpdate = isPreviousClass
+        ? parseInt(selectedStudent.classId) - 1
+        : parseInt(selectedStudent.classId)
+
+      if (classToUpdate < 1) return
+
+      const feeKey = `classId${classToUpdate}`
+      const currentFeeData = selectedStudent.feeHistory?.[feeKey] || {
+        term1: { amount: 0, paidAmount: 0, status: "pending", dueDate: "" },
+        term2: { amount: 0, paidAmount: 0, status: "pending", dueDate: "" },
+        totalFee: 0,
+      }
+
+      const paymentAmount = parseFloat(partialPayment.amount)
+      const currentTermData = currentFeeData[term] || {
+        amount: 0,
+        paidAmount: 0,
+        status: "pending",
+      }
+
+      const newPaidAmount = (currentTermData.paidAmount || 0) + paymentAmount
+      const newStatus =
+        newPaidAmount >= (currentTermData.amount || 0) ? "paid" : "pending"
+
+      const updatedTerm = {
+        ...currentTermData,
+        paidAmount: newPaidAmount,
+        status: newStatus,
+      }
 
       const updatedFees = {
-        ...selectedStudent.fees,
-        [term]: {
-          ...selectedStudent.fees[term],
-          paidAmount: selectedStudent.fees[term].paidAmount + paymentAmount,
-          status:
-            selectedStudent.fees[term].paidAmount + paymentAmount >=
-            selectedStudent.fees[term].amount
-              ? "paid"
-              : "pending",
-        },
+        ...currentFeeData,
+        [term]: updatedTerm,
+        updatedAt: new Date(),
       }
 
       await updateDoc(studentRef, {
-        fees: updatedFees,
+        [`feeHistory.${feeKey}`]: updatedFees,
+        lastFeeUpdate: new Date(),
       })
 
-      setSelectedStudent({
+      const updatedStudent = {
         ...selectedStudent,
-        fees: updatedFees,
-      })
+        feeHistory: {
+          ...selectedStudent.feeHistory,
+          [feeKey]: updatedFees,
+        },
+      }
 
-      setStudents(
-        students.map((student) =>
-          student.id === selectedStudent.id
-            ? { ...student, fees: updatedFees }
-            : student
-        )
+      setSelectedStudent(updatedStudent)
+      setStudents((prev) =>
+        prev.map((s) => (s.id === selectedStudent.id ? updatedStudent : s))
       )
-      setPartialPayment({ term: "", amount: "" })
+      setPartialPayment({ term: "", amount: "", isPreviousClass: false })
     } catch (error) {
       console.error("Error updating partial payment:", error)
+    } finally {
+      setLoading(false)
     }
   }
 
-  const calculatePendingAmount = (term) => {
+  const calculatePendingAmount = (term, isPreviousClass = false) => {
     if (!selectedStudent) return 0
+    const classToCheck = isPreviousClass
+      ? parseInt(selectedStudent.classId) - 1
+      : parseInt(selectedStudent.classId)
+
+    if (classToCheck < 1) return 0 // No previous class for class 1
+
+    const feeKey = `classId${classToCheck}`
+    const termData = selectedStudent.feeHistory?.[feeKey]?.[term] || {}
+    return (termData.amount || 0) - (termData.paidAmount || 0)
+  }
+
+  const renderTermCard = (term, isPreviousClass = false) => {
+    if (!selectedStudent) return null
+
+    const classToShow = isPreviousClass
+      ? parseInt(selectedStudent.classId) - 1
+      : parseInt(selectedStudent.classId)
+
+    if (classToShow < 1 && isPreviousClass) return null
+
+    const feeKey = `classId${classToShow}`
+    const termData = selectedStudent.feeHistory?.[feeKey]?.[term] || {}
+    const isPaid = termData.status === "paid"
+    const pendingAmount = calculatePendingAmount(term, isPreviousClass)
+
+    if (isPreviousClass && pendingAmount <= 0) return null
+
     return (
-      selectedStudent.fees[term].amount - selectedStudent.fees[term].paidAmount
+      <div
+        className={`${styles.termCard} ${
+          isPreviousClass ? styles.previousTermCard : ""
+        }`}
+        key={`${term}-${isPreviousClass}`}
+      >
+        <h4 className={styles.termTitle}>
+          {term === "term1" ? "Term 1" : "Term 2"} Fees{" "}
+          {isPreviousClass ? `(Class ${classToShow})` : ""}
+        </h4>
+        <div className={styles.detailsGrid}>
+          <div>
+            <p className={styles.detailLabel}>Amount</p>
+            <p className={styles.detailValue}>₹{termData.amount || 0}</p>
+          </div>
+          <div>
+            <p className={styles.detailLabel}>Due Date</p>
+            <p className={styles.detailValue}>
+              {termData.dueDate || "Not set"}
+            </p>
+          </div>
+          <div>
+            <p className={styles.detailLabel}>Paid Amount</p>
+            <p className={styles.detailValue}>₹{termData.paidAmount || 0}</p>
+          </div>
+          <div>
+            <p className={styles.detailLabel}>Pending Amount</p>
+            <p className={styles.detailValue}>₹{pendingAmount}</p>
+          </div>
+          <div>
+            <p className={styles.detailLabel}>Status</p>
+            <p
+              className={`${styles.detailValue} ${styles.statusValue} ${
+                isPaid ? styles.paidStatus : styles.pendingStatus
+              }`}
+            >
+              {termData.status || "pending"}
+            </p>
+          </div>
+        </div>
+        <div className={styles.buttonGroup}>
+          <button
+            onClick={() => updateFeeStatus(term, "paid", isPreviousClass)}
+            disabled={isPaid}
+            className={`${styles.actionButton} ${styles.paidButton}`}
+          >
+            Mark as Paid
+          </button>
+          <button
+            onClick={() => updateFeeStatus(term, "pending", isPreviousClass)}
+            disabled={!isPaid}
+            className={`${styles.actionButton} ${styles.pendingButton}`}
+          >
+            Mark as Pending
+          </button>
+        </div>
+        <div className={styles.partialPaymentContainer}>
+          <h5 className={styles.termTitle}>Record Partial Payment</h5>
+          <input
+            type="number"
+            value={
+              partialPayment.term === term &&
+              partialPayment.isPreviousClass === isPreviousClass
+                ? partialPayment.amount
+                : ""
+            }
+            onChange={(e) =>
+              setPartialPayment({
+                term,
+                amount: e.target.value,
+                isPreviousClass,
+              })
+            }
+            className={styles.partialPaymentInput}
+            placeholder="Enter amount paid"
+            disabled={isPaid}
+          />
+          <button
+            onClick={() => handlePartialPayment(term, isPreviousClass)}
+            disabled={
+              !partialPayment.amount ||
+              partialPayment.term !== term ||
+              partialPayment.isPreviousClass !== isPreviousClass ||
+              isPaid
+            }
+            className={styles.partialPaymentButton}
+          >
+            Record Payment
+          </button>
+        </div>
+      </div>
     )
   }
 
@@ -172,8 +363,8 @@ const Fees = () => {
               }
               className={styles.filterInput}
               placeholder="Enter class"
-              min={1}
-              max={10}
+              min="1"
+              max="10"
               required
             />
           </div>
@@ -196,7 +387,7 @@ const Fees = () => {
           <button
             onClick={fetchStudents}
             className={styles.applyButton}
-            disabled={!filters.class || !filters.section}
+            disabled={!filters.class || !filters.section || loading}
           >
             {loading ? "Searching..." : "Search Students"}
           </button>
@@ -214,46 +405,55 @@ const Fees = () => {
         ) : (
           <div className={styles.studentsList}>
             <h2 className={styles.listTitle}>Students</h2>
-            <ul>
-              {students.map((student) => (
-                <li
-                  key={student.id}
-                  className={styles.studentItem}
-                  onClick={() => {
-                    setSelectedStudent(student)
-                    setIsModalOpen(true)
-                  }}
-                >
-                  <div className={styles.studentHeader}>
-                    <span className={styles.studentName}>
-                      {student.studentName || `Student ${student.id}`}
-                    </span>
-                    <span className={styles.studentClass}>
-                      Class {student.classId}, Section {student.sectionId}
-                    </span>
-                  </div>
-                  <div className={styles.statusContainer}>
-                    <span
-                      className={`${styles.statusBadge} ${
-                        student.fees.term1.status === "paid"
-                          ? styles.paidStatus
-                          : styles.pendingStatus
-                      }`}
-                    >
-                      Term 1: {student.fees.term1.status}
-                    </span>
-                    <span
-                      className={`${styles.statusBadge} ${
-                        student.fees.term2.status === "paid"
-                          ? styles.paidStatus
-                          : styles.pendingStatus
-                      }`}
-                    >
-                      Term 2: {student.fees.term2.status}
-                    </span>
-                  </div>
-                </li>
-              ))}
+            <ul className={styles.studentList}>
+              {students.map((student) => {
+                const currentClass = parseInt(student.classId)
+                const feeData = student.feeHistory?.[
+                  `classId${currentClass}`
+                ] || {
+                  term1: { status: "pending" },
+                  term2: { status: "pending" },
+                }
+                return (
+                  <li
+                    key={student.id}
+                    className={styles.studentItem}
+                    onClick={() => {
+                      setSelectedStudent(student)
+                      setIsModalOpen(true)
+                    }}
+                  >
+                    <div className={styles.studentHeader}>
+                      <span className={styles.studentName}>
+                        {student.studentName || `Student ${student.id}`}
+                      </span>
+                      <span className={styles.studentClass}>
+                        Class {student.classId}, Section {student.sectionId}
+                      </span>
+                    </div>
+                    <div className={styles.statusContainer}>
+                      <span
+                        className={`${styles.statusBadge} ${
+                          feeData.term1.status === "paid"
+                            ? styles.paidStatus
+                            : styles.pendingStatus
+                        }`}
+                      >
+                        Term 1: {feeData.term1.status}
+                      </span>
+                      <span
+                        className={`${styles.statusBadge} ${
+                          feeData.term2.status === "paid"
+                            ? styles.paidStatus
+                            : styles.pendingStatus
+                        }`}
+                      >
+                        Term 2: {feeData.term2.status}
+                      </span>
+                    </div>
+                  </li>
+                )
+              })}
             </ul>
           </div>
         )}
@@ -281,201 +481,33 @@ const Fees = () => {
               </div>
 
               <div className={styles.modalBody}>
-                <div className={styles.modalTotalFee}>
-                  Total Fee:{" "}
-                  {selectedStudent.fees.totalFee
-                    ? selectedStudent.fees.totalFee
-                    : 0}
-                </div>
-                <div>
-                  <div className={styles.termCard}>
-                    <h4 className={styles.termTitle}>Term 1 Fees</h4>
-                    <div className={styles.detailsGrid}>
-                      <div>
-                        <p className={styles.detailLabel}>Amount</p>
-                        <p className={styles.detailValue}>
-                          ₹{selectedStudent.fees.term1.amount}
-                        </p>
-                      </div>
-                      <div>
-                        <p className={styles.detailLabel}>Due Date</p>
-                        <p className={styles.detailValue}>
-                          {selectedStudent.fees.term1.dueDate}
-                        </p>
-                      </div>
-                      <div>
-                        <p className={styles.detailLabel}>Paid Amount</p>
-                        <p className={styles.detailValue}>
-                          ₹{selectedStudent.fees.term1.paidAmount}
-                        </p>
-                      </div>
-                      <div>
-                        <p className={styles.detailLabel}>Pending Amount</p>
-                        <p className={styles.detailValue}>
-                          ₹{calculatePendingAmount("term1")}
-                        </p>
-                      </div>
-                      <div>
-                        <p className={styles.detailLabel}>Status</p>
-                        <p
-                          className={`${styles.detailValue} ${
-                            styles.statusValue
-                          } ${
-                            selectedStudent.fees.term1.status === "paid"
-                              ? styles.paidStatus
-                              : styles.pendingStatus
-                          }`}
-                        >
-                          {selectedStudent.fees.term1.status}
-                        </p>
+                {parseInt(selectedStudent.classId) > 1 &&
+                  selectedStudent.previousPending?.total > 0 && (
+                    <div className={styles.previousPendingSection}>
+                      <h3 className={styles.previousPendingTitle}>
+                        Previous Class (Class{" "}
+                        {parseInt(selectedStudent.classId) - 1}) Pending Fees
+                      </h3>
+                      <div className={styles.previousTermsContainer}>
+                        {renderTermCard("term1", true)}
+                        {renderTermCard("term2", true)}
                       </div>
                     </div>
-                    <div className={styles.buttonGroup}>
-                      <button
-                        onClick={() => updateFeeStatus("term1", "paid")}
-                        disabled={selectedStudent.fees.term1.status === "paid"}
-                        className={`${styles.actionButton} ${styles.paidButton}`}
-                      >
-                        Mark as Paid
-                      </button>
-                      <button
-                        onClick={() => updateFeeStatus("term1", "pending")}
-                        disabled={
-                          selectedStudent.fees.term1.status === "pending"
-                        }
-                        className={`${styles.actionButton} ${styles.pendingButton}`}
-                      >
-                        Mark as Pending
-                      </button>
-                    </div>
-                    <div className={styles.partialPaymentContainer}>
-                      <h5 className={styles.termTitle}>
-                        Record Partial Payment
-                      </h5>
-                      <input
-                        type="text"
-                        value={
-                          partialPayment.term === "term1"
-                            ? formatIndianNumber(partialPayment.amount)
-                            : ""
-                        }
-                        onChange={(e) =>
-                          setPartialPayment({
-                            term: "term1",
-                            amount: e.target.value,
-                          })
-                        }
-                        className={styles.partialPaymentInput}
-                        placeholder="Enter amount paid"
-                        disabled={selectedStudent.fees.term1.status === "paid"}
-                      />
-                      <button
-                        onClick={() => handlePartialPayment("term1")}
-                        disabled={
-                          !partialPayment.amount ||
-                          partialPayment.term !== "term1" ||
-                          selectedStudent.fees.term1.status === "paid"
-                        }
-                        className={styles.partialPaymentButton}
-                      >
-                        Record Payment
-                      </button>
-                    </div>
-                  </div>
+                  )}
 
-                  <div className={styles.termCard}>
-                    <h4 className={styles.termTitle}>Term 2 Fees</h4>
-                    <div className={styles.detailsGrid}>
-                      <div>
-                        <p className={styles.detailLabel}>Amount</p>
-                        <p className={styles.detailValue}>
-                          ₹{selectedStudent.fees.term2.amount}
-                        </p>
-                      </div>
-                      <div>
-                        <p className={styles.detailLabel}>Due Date</p>
-                        <p className={styles.detailValue}>
-                          {selectedStudent.fees.term2.dueDate}
-                        </p>
-                      </div>
-                      <div>
-                        <p className={styles.detailLabel}>Paid Amount</p>
-                        <p className={styles.detailValue}>
-                          ₹{selectedStudent.fees.term2.paidAmount}
-                        </p>
-                      </div>
-                      <div>
-                        <p className={styles.detailLabel}>Pending Amount</p>
-                        <p className={styles.detailValue}>
-                          ₹{calculatePendingAmount("term2")}
-                        </p>
-                      </div>
-                      <div>
-                        <p className={styles.detailLabel}>Status</p>
-                        <p
-                          className={`${styles.detailValue} ${
-                            styles.statusValue
-                          } ${
-                            selectedStudent.fees.term2.status === "paid"
-                              ? styles.paidStatus
-                              : styles.pendingStatus
-                          }`}
-                        >
-                          {selectedStudent.fees.term2.status}
-                        </p>
-                      </div>
-                    </div>
-                    <div className={styles.buttonGroup}>
-                      <button
-                        onClick={() => updateFeeStatus("term2", "paid")}
-                        disabled={selectedStudent.fees.term2.status === "paid"}
-                        className={`${styles.actionButton} ${styles.paidButton}`}
-                      >
-                        Mark as Paid
-                      </button>
-                      <button
-                        onClick={() => updateFeeStatus("term2", "pending")}
-                        disabled={
-                          selectedStudent.fees.term2.status === "pending"
-                        }
-                        className={`${styles.actionButton} ${styles.pendingButton}`}
-                      >
-                        Mark as Pending
-                      </button>
-                    </div>
-                    <div className={styles.partialPaymentContainer}>
-                      <h5 className={styles.termTitle}>
-                        Record Partial Payment
-                      </h5>
-                      <input
-                        type="text"
-                        value={
-                          partialPayment.term === "term2"
-                            ? formatIndianNumber(partialPayment.amount)
-                            : ""
-                        }
-                        onChange={(e) =>
-                          setPartialPayment({
-                            term: "term2",
-                            amount: e.target.value,
-                          })
-                        }
-                        className={styles.partialPaymentInput}
-                        placeholder="Enter amount paid"
-                        disabled={selectedStudent.fees.term2.status === "paid"}
-                      />
-                      <button
-                        onClick={() => handlePartialPayment("term2")}
-                        disabled={
-                          !partialPayment.amount ||
-                          partialPayment.term !== "term2" ||
-                          selectedStudent.fees.term2.status === "paid"
-                        }
-                        className={styles.partialPaymentButton}
-                      >
-                        Record Payment
-                      </button>
-                    </div>
+                <div className={styles.currentTermsSection}>
+                  <h3 className={styles.currentTermsTitle}>
+                    Current Class Fees
+                  </h3>
+                  <div className={styles.modalTotalFee}>
+                    Total Current Fee: ₹
+                    {selectedStudent.feeHistory?.[
+                      `classId${parseInt(selectedStudent.classId)}`
+                    ]?.totalFee || 0}
+                  </div>
+                  <div className={styles.termsContainer}>
+                    {renderTermCard("term1")}
+                    {renderTermCard("term2")}
                   </div>
                 </div>
               </div>

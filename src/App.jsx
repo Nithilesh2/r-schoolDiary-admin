@@ -15,6 +15,7 @@ import AcademicYearPromote from "./pages/AcademicYearPromote/AcademicYearPromote
 import AcademicYearCurrent from "./pages/AcademicYearCurrent/AcademicYearCurrent";
 import Timetable from "./pages/Timetable/Timetable";
 import Fees from "./pages/Fees/Fees";
+import ManageFees from "./pages/Fees/ManageFees";
 
 function App() {
   return (
@@ -95,10 +96,18 @@ function App() {
           }
         />
         <Route
-          path="/Fees"
+          path="/fees/set-total-fees"
           element={
             <ProtectedRoute>
               <Fees />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/fees/manage-fees"
+          element={
+            <ProtectedRoute>
+              <ManageFees />
             </ProtectedRoute>
           }
         />

@@ -7,6 +7,7 @@ import {
   where,
   doc,
   updateDoc,
+  writeBatch,
 } from "firebase/firestore"
 import { firestore } from "../../firebase/firebaseConfig"
 import styles from "./AcademicYearPromote.module.css"
@@ -38,7 +39,7 @@ const AcademicYearPromote = () => {
   const [selectedStudents, setSelectedStudents] = useState([])
   const [studentToPromote, setStudentToPromote] = useState(null)
 
-  const classes = [...Array.from({ length: 10 }, (_, i) => i + 1)]
+  const classes = Array.from({ length: 10 }, (_, i) => i + 1)
 
   const loadStudents = async () => {
     if (!selectedClass) return
@@ -51,25 +52,22 @@ const AcademicYearPromote = () => {
       setSelectAll(false)
 
       let studentsQuery
-      if (adminDetails.adminType !== "school-admin") {
-        studentsQuery = query(
-          collection(firestore, "students"),
-          where("classId", "==", selectedClass.toString())
-        )
-      } else {
-        studentsQuery = query(
-          collection(firestore, "students"),
-          where("schoolId", "==", adminDetails.schoolId),
-          where("classId", "==", selectedClass.toString())
-        )
+      const constraints = [
+        where("classId", "==", selectedClass.toString()),
+      ]
+
+      if (adminDetails.adminType === "school-admin") {
+        constraints.push(where("schoolId", "==", adminDetails.schoolId))
       }
+
+      studentsQuery = query(collection(firestore, "students"), ...constraints)
 
       const studentsSnapshot = await getDocs(studentsQuery)
       const studentsData = studentsSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }))
-      console.log(studentsData)
+
       setStudents(studentsData)
     } catch (err) {
       console.error("Error loading students:", err)
@@ -86,34 +84,42 @@ const AcademicYearPromote = () => {
   }, [selectedClass])
 
   const handlePromoteStudents = async () => {
+    if (selectedStudents.length === 0) {
+      setError("Please select at least one student to promote")
+      return
+    }
+
     try {
       setOpenBulkConfirm(false)
       setLoading(true)
       setError("")
       setSuccess("")
 
-      await Promise.all(
-        selectedStudents.map(async (studentId) => {
-          const student = students.find((s) => s.id === studentId)
-          if (student) {
-            const currentClass = parseInt(student.classId)
-            if (!isNaN(currentClass)) {
-              const studentRef = doc(firestore, "students", studentId)
-              await updateDoc(studentRef, {
-                classId:
-                  currentClass === 10
-                    ? "Graduate"
-                    : (currentClass + 1).toString(),
-                promotedOn: new Date(),
-              })
-            }
-          }
-        })
-      )
+      const batch = writeBatch(firestore)
+      const promotionDate = new Date()
 
-      setSuccess(
-        `${selectedStudents.length} students have been promoted successfully!`
-      )
+      selectedStudents.forEach((studentId) => {
+        const student = students.find((s) => s.id === studentId)
+        if (student) {
+          const currentClass = parseInt(student.classId)
+          if (!isNaN(currentClass)) {
+            const studentRef = doc(firestore, "students", studentId)
+            batch.update(studentRef, {
+              classId:
+                currentClass === 10
+                  ? "Graduate"
+                  : (currentClass + 1).toString(),
+              promotedOn: promotionDate,
+              lastUpdated: promotionDate,
+            })
+          }
+        }
+      })
+
+      await batch.commit()
+
+      setSuccess(`${selectedStudents.length} students promoted successfully!`)
+      setSelectedStudents([])
       loadStudents()
     } catch (err) {
       console.error("Promotion error:", err)
@@ -136,19 +142,23 @@ const AcademicYearPromote = () => {
       if (student) {
         const currentClass = parseInt(student.classId)
         if (!isNaN(currentClass)) {
+          const promotionDate = new Date()
           const studentRef = doc(firestore, "students", studentToPromote)
           await updateDoc(studentRef, {
             classId:
               currentClass === 10 ? "Graduate" : (currentClass + 1).toString(),
-            promotedOn: new Date(),
+            promotedOn: promotionDate,
+            lastUpdated: promotionDate,
           })
-          setSuccess(`Student ${student.studentName} promoted successfully!`)
+          setSuccess(
+            `${student.studentName || "Student"} promoted successfully!`
+          )
           loadStudents()
         }
       }
     } catch (err) {
       console.error("Promotion error:", err)
-      setError("Failed to promote student. Please try again.")
+      setError(`Failed to promote student. ${err.message}`)
     } finally {
       setLoading(false)
       setStudentToPromote(null)
@@ -164,13 +174,11 @@ const AcademicYearPromote = () => {
   }
 
   const handleSelectAll = (e) => {
-    if (e.target.checked) {
-      const filteredIds = filteredStudents.map((student) => student.id)
-      setSelectedStudents(filteredIds)
-    } else {
-      setSelectedStudents([])
-    }
-    setSelectAll(e.target.checked)
+    const isChecked = e.target.checked
+    setSelectAll(isChecked)
+    setSelectedStudents(
+      isChecked ? filteredStudents.map((student) => student.id) : []
+    )
   }
 
   const handleSinglePromoteClick = (studentId) => {
@@ -178,11 +186,9 @@ const AcademicYearPromote = () => {
     setOpenSingleConfirm(true)
   }
 
-  const filteredStudents = students
-    .filter((student) => student.classId !== "Graduate")
-    .filter((student) =>
-      student.studentName?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+  const filteredStudents = students.filter((student) =>
+    student.studentName?.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
     <div className={styles.adminLayout}>
@@ -343,7 +349,9 @@ const AcademicYearPromote = () => {
                                 onClick={() =>
                                   handleSinglePromoteClick(student.id)
                                 }
-                                disabled={loading || selectedClass === "Graduate"}
+                                disabled={
+                                  loading || selectedClass === "Graduate"
+                                }
                                 startIcon={
                                   <svg
                                     width="14"

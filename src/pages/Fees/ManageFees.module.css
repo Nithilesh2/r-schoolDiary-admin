@@ -1,0 +1,304 @@
+.adminLayout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f7fa;
+}
+.mainContent {
+  flex: 1;
+  transition: all 0.3s ease;
+}
+.content {
+  padding: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+.header {
+  margin-bottom: 1.5rem;
+}
+.header h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--indigo);
+  margin: 0;
+}
+.subHeader {
+  color: #718096;
+  margin: 0.25rem 0 0;
+  font-size: 1rem;
+}
+.card {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+}
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.cardHeader h2{
+  color: var(--indigo);
+}
+.alertError {
+  color: #d32f2f;
+  background: #fde8e8;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+.alertSuccess {
+  color: #388e3c;
+  background: #e8f5e9;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+}
+.feeForm {
+  margin-bottom: 2rem;
+}
+.feeInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.termContainer {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.inputBar {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+}
+.termBox {
+  flex: 1;
+  min-width: 250px;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: #f8fafc;
+}
+.studentSelection {
+  margin: 1.5rem 0;
+}
+.selectionHeader {
+  margin-bottom: 1rem;
+}
+.studentList {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+}
+.studentItem {
+  padding: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+.studentItem:last-child {
+  border-bottom: none;
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+.feeSummary {
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+.formGroup {
+  margin-bottom: 1rem;
+}
+.formGroup label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #4a5568;
+}
+.formGroup select,
+.formGroup input[type="text"],
+.formGroup input[type="number"],
+.formGroup input[type="date"] {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  background-color: white;
+}
+.formGroup select:focus,
+.formGroup input:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 1.2em;
+  height: 1.2em;
+  border: 2px solid #cbd5e0;
+  border-radius: 0.25em;
+  margin-right: 0.5em;
+  position: relative;
+  top: 0.2em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+input[type="checkbox"]:checked {
+  background-color: #4299e1;
+  border-color: #4299e1;
+}
+input[type="checkbox"]:checked::after {
+  content: "✓";
+  position: absolute;
+  color: white;
+  font-size: 0.9em;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+input[type="checkbox"]:indeterminate {
+  background-color: #4299e1;
+  border-color: #4299e1;
+}
+input[type="checkbox"]:indeterminate::after {
+  content: "─";
+  position: absolute;
+  color: white;
+  font-size: 0.9em;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.actions button,
+.modalActions button {
+  padding: 0.5rem 1.5rem;
+  background-color: #4299e1;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.actions button:hover,
+.modalActions button:hover {
+  background-color: #3182ce;
+}
+.actions button:disabled,
+.modalActions button:disabled {
+  background-color: #cbd5e0;
+  cursor: not-allowed;
+}
+.actions button.confirmButton,
+.modalActions button.confirmButton {
+  background-color: #38a169;
+}
+.actions button.confirmButton:hover,
+.modalActions button.confirmButton:hover {
+  background-color: #2f855a;
+}
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal {
+  background-color: white;
+  border-radius: 0.75rem;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+.modalHeader {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+.modalHeader h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #2d3748;
+}
+.modalContent {
+  padding: 1.5rem;
+}
+.modalActions {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+.warningText {
+  color: #e53e3e;
+  font-weight: 500;
+  margin-top: 1rem;
+}
+.flex {
+  display: flex;
+}
+.items-center {
+  align-items: center;
+}
+.gap-2 {
+  gap: 0.5rem;
+}
+input:disabled {
+  background-color: #edf2f7;
+  color: #718096;
+  cursor: not-allowed;
+}
+@media (max-width: 768px) {
+  .content {
+    padding: 1rem;
+  }
+  .card {
+    padding: 1rem;
+  }
+  .termContainer {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .termBox {
+    min-width: 100%;
+  }
+}
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 1.5rem;
+  }
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .blurredContent {
+    filter: blur(2px);
+    pointer-events: none;
+    user-select: none;
+  }
+}

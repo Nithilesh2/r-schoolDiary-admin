@@ -156,11 +156,11 @@
   font-weight: 600;
   color: var(--indigo);
 }
-.modalTotalFee{
+.modalTotalFee {
   margin-bottom: 10px;
 }
 .closeButton {
-  color: #718096;
+  color: var(--indigo);
   background: none;
   border: none;
   font-size: 1.25rem;
@@ -222,6 +222,9 @@
   background-color: #e2e8f0;
   cursor: not-allowed;
 }
+.currentTermsTitle {
+  color: var(--indigo);
+}
 .pendingButton {
   background-color: #ed8936;
   color: white;
@@ -258,6 +261,33 @@
 }
 .partialPaymentButton:hover {
   background-color: #3182ce;
+}
+.previousPendingSection {
+  border-bottom: 2px solid var(--indigo);
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+}
+.previousPending {
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: #fff8e1;
+  border-radius: 8px;
+}
+.previousPendingTitle {
+  margin-top: 0;
+  color: #ff6d00;
+}
+.previousPendingDetails {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+.previousPendingTotal {
+  grid-column: span 2;
+  font-weight: bold;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #ffcc80;
 }
 @media only screen and (max-width: 650px) {
   .mainContent {
