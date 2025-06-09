@@ -176,6 +176,13 @@ const ManageFees = () => {
       )
       setOpenConfirm(false)
       loadStudents()
+      setFeeStructure({
+        totalAmount: "",
+        term1Amount: "",
+        term1DueDate: "",
+        term2Amount: "",
+        term2DueDate: "",
+      })
     } catch (err) {
       console.error("Error updating fees:", err)
       setError("Failed to update fees. Please try again.")
@@ -362,7 +369,7 @@ const ManageFees = () => {
                       !feeStructure.term2DueDate
                     }
                   >
-                    {loading ? "Processing..." : "Update Fees"}
+                    Update Fees
                   </button>
                 </div>
               </>
@@ -404,7 +411,7 @@ const ManageFees = () => {
                 onClick={handleSubmitFees}
                 className={styles.confirmButton}
               >
-                Confirm Update
+                {loading ? "Processing..." : "Confirm Update"}
               </button>
             </div>
           </div>

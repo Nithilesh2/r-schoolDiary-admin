@@ -275,7 +275,7 @@ const AcademicYearPromote = () => {
                     />
                     <Button
                       variant="contained"
-                      style={{ backgroundColor: "indigo", color: "white" }}
+                      style={{ backgroundColor: "indigo", color: "white", fontFamily: 'Poppins' }}
                       size="small"
                       disabled={
                         loading ||
@@ -344,6 +344,7 @@ const AcademicYearPromote = () => {
                                 style={{
                                   backgroundColor: "indigo",
                                   color: "white",
+                                  fontFamily: 'Poppins'
                                 }}
                                 size="small"
                                 onClick={() =>
