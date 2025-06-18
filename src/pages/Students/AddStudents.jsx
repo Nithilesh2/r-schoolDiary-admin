@@ -264,7 +264,7 @@ const AddStudent = () => {
           },
           body: JSON.stringify({
             toEmail: father.email,
-            username: studentEmail,
+            username: admissionNum.toString(),
             password: tempPass,
             studentName: name,
             fatherName: father.name,
@@ -362,7 +362,7 @@ const AddStudent = () => {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="dob">Date of Birth</label>
+                  <label htmlFor="dob">Date of Birth*</label>
                   <input
                     type="date"
                     id="dob"
@@ -374,7 +374,7 @@ const AddStudent = () => {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="bloodGroup">Blood Group</label>
+                  <label htmlFor="bloodGroup">Blood Group*</label>
                   <select
                     id="bloodGroup"
                     name="bloodGroup"
@@ -390,6 +390,7 @@ const AddStudent = () => {
                     <option value="AB-">AB-</option>
                     <option value="O+">O+</option>
                     <option value="O-">O-</option>
+                    <option value="None">Dont Know</option>
                   </select>
                 </div>
 
@@ -566,7 +567,7 @@ const AddStudent = () => {
                   <span>Fee Details</span>
                 </div>
                 <div className={styles.formGroup}>
-                  <label htmlFor="totalFee">Total Fee (for both terms)</label>
+                  <label htmlFor="totalFee">Total Fee (for both terms)*</label>
                   <input
                     type="text"
                     id="totalFee"
@@ -612,7 +613,7 @@ const AddStudent = () => {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="fatherEmail">Father's Email</label>
+                  <label htmlFor="fatherEmail">Father's Email*</label>
                   <input
                     type="email"
                     id="fatherEmail"
@@ -625,7 +626,7 @@ const AddStudent = () => {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="fatherOccupation">Father's Occupation</label>
+                  <label htmlFor="fatherOccupation">Father's Occupation*</label>
                   <input
                     type="text"
                     id="fatherOccupation"
@@ -642,7 +643,7 @@ const AddStudent = () => {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="motherName">Mother's Name</label>
+                  <label htmlFor="motherName">Mother's Name*</label>
                   <input
                     type="text"
                     id="motherName"
@@ -655,7 +656,7 @@ const AddStudent = () => {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="motherPhone">Mother's Phone</label>
+                  <label htmlFor="motherPhone">Mother's Phone*</label>
                   <input
                     type="tel"
                     id="motherPhone"
@@ -669,7 +670,7 @@ const AddStudent = () => {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="motherEmail">Mother's Email</label>
+                  <label htmlFor="motherEmail">Mother's Email*</label>
                   <input
                     type="email"
                     id="motherEmail"
@@ -682,7 +683,7 @@ const AddStudent = () => {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label htmlFor="motherOccupation">Mother's Occupation</label>
+                  <label htmlFor="motherOccupation">Mother's Occupation*</label>
                   <input
                     type="text"
                     id="motherOccupation"

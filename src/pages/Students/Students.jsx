@@ -361,7 +361,8 @@ const Students = () => {
                     type="text"
                     name="classId"
                     value={formData.classId}
-                    style={{ cursor: "not-allowed" }}
+                    onChange={handleChange}
+                    required
                   />
                 </div>
 
@@ -373,6 +374,7 @@ const Students = () => {
                     value={formData.sectionId}
                     onChange={handleChange}
                     required
+                    maxLength={1}
                   />
                 </div>
 

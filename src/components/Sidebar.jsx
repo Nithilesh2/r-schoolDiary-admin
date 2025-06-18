@@ -14,6 +14,7 @@ import {
   ChevronsUp,
   Clock,
   DollarSign,
+  FileSpreadsheet,
 } from "lucide-react"
 import styles from "./styles/Sidebar.module.css"
 import { AppContext } from "../context/AppContext"
@@ -93,6 +94,11 @@ const Sidebar = () => {
           name: "Add Student",
           path: "/students/add",
           icon: <CirclePlus size={18} />,
+        },
+        {
+          name: "Add Bulk Student",
+          path: "/students/add-bulk",
+          icon: <FileSpreadsheet size={18} />,
         },
       ],
     },

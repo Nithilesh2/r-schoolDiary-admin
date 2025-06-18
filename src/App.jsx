@@ -16,6 +16,7 @@ import AcademicYearCurrent from "./pages/AcademicYearCurrent/AcademicYearCurrent
 import Timetable from "./pages/Timetable/Timetable";
 import Fees from "./pages/Fees/Fees";
 import ManageFees from "./pages/Fees/ManageFees";
+import AddBulkStudents from './pages/Students/AddBulkStudents';
 
 function App() {
   return (
@@ -68,6 +69,14 @@ function App() {
           element={
             <ProtectedRoute>
               <AddStudents />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/students/add-bulk"
+          element={
+            <ProtectedRoute>
+              <AddBulkStudents />
             </ProtectedRoute>
           }
         />
