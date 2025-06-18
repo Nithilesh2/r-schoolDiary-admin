@@ -132,7 +132,7 @@ const Sidebar = () => {
             icon: <DollarSign size={20} />,
             dropdown: [
               {
-                name: "Set Total Fees",
+                name: "Manage Fees",
                 path: "/fees/set-total-fees",
                 icon: <CirclePlus size={18} />,
               },

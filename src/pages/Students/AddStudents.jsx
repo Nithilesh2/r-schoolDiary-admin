@@ -151,8 +151,6 @@ const AddStudent = () => {
 
     try {
       setLoading(true)
-
-      const halfFee = Number(totalFee) / 2
       const schoolRef = doc(db, "schools", schoolId)
       const schoolSnap = await getDoc(schoolRef)
 
@@ -196,19 +194,6 @@ const AddStudent = () => {
         parents: {
           father,
           mother,
-        },
-        fees: {
-          totalFee: totalFee,
-          term1: {
-            amount: halfFee,
-            paidAmount: 0,
-            status: "pending",
-          },
-          term2: {
-            amount: halfFee,
-            paidAmount: 0,
-            status: "pending",
-          },
         },
       })
 

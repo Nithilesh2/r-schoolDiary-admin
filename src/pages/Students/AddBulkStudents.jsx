@@ -289,12 +289,11 @@ const BulkImportStudents = () => {
             await createUserWithEmailAndPassword(auth, studentEmail, tempPass)
               .then(async (userCredential) => {
                 const userId = userCredential.user.uid
-                const halfFee = Number(student.totalFee) / 2
 
                 const studentData = {
                   uid: userId,
                   admissionNumber: admissionNum.toString(),
-                  classId: student.class,
+                  classId: String(student.class),
                   studentName: student.studentName,
                   studentEmail,
                   address: student.address,
@@ -318,19 +317,6 @@ const BulkImportStudents = () => {
                       phone: student.motherPhone || "",
                       email: student.motherEmail || "",
                       occupation: student.motherOccupation || "",
-                    },
-                  },
-                  fees: {
-                    totalFee: parseInt(student.totalFee),
-                    term1: {
-                      amount: halfFee,
-                      paidAmount: 0,
-                      status: "pending",
-                    },
-                    term2: {
-                      amount: halfFee,
-                      paidAmount: 0,
-                      status: "pending",
                     },
                   },
                 }
